@@ -1,0 +1,355 @@
+.caixa-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 80px 0px 20px 0px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 100%;
+}
+
+.caixa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  color: white;
+  padding: 0 20px;
+}
+
+.caixa-header h1 {
+  font-size: 2rem;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.btn-voltar {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-voltar:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.erro-msg {
+  background: #e74c3c;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.sucesso-msg {
+  background: #27ae60;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.caixa-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  width: 100%;
+  margin: 0;
+  padding: 0 20px;
+}
+
+/* Resumo da Venda */
+.resumo-venda {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.resumo-venda h2 {
+  color: #2c3e50;
+  margin: 0 0 12px 0;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 6px;
+}
+
+.venda-info {
+  margin-bottom: 15px;
+}
+
+.info-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.info-linha:last-child {
+  border-bottom: none;
+}
+
+.info-linha.total {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #27ae60;
+  border-top: 2px solid #27ae60;
+  margin-top: 10px;
+  padding-top: 15px;
+}
+
+.itens-venda h3 {
+  color: #34495e;
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+}
+
+.itens-lista {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ecf0f1;
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.item-linha {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 15px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f8f9fa;
+  align-items: center;
+}
+
+.item-linha:last-child {
+  border-bottom: none;
+}
+
+.item-nome {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.item-qtd {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.item-preco {
+  font-weight: bold;
+  color: #27ae60;
+}
+
+/* Área de Pagamento */
+.pagamento-area {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.pagamento-area h2 {
+  color: #2c3e50;
+  margin: 0 0 12px 0;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 6px;
+}
+
+.formas-pagamento {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.forma-card {
+  background: #f8f9fa;
+  border: 2px solid #ecf0f1;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.forma-card:hover {
+  border-color: #3498db;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
+
+.forma-card.selected {
+  border-color: #27ae60;
+  background: #e8f5e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+}
+
+.forma-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.forma-nome {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.dinheiro-campos {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 6px;
+}
+
+.campo-grupo {
+  margin-bottom: 10px;
+}
+
+.campo-grupo label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.campo-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.campo-inline label {
+  display: inline;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.campo-inline .input-valor {
+  width: auto;
+  flex: 1;
+}
+
+.input-valor {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ecf0f1;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  transition: border-color 0.3s ease;
+}
+
+.input-valor:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.input-observacoes {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #ecf0f1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  resize: none;
+  height: 40px;
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+}
+
+.input-observacoes:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.troco-info {
+  background: #e8f5e8;
+  border: 1px solid #27ae60;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+  font-weight: bold;
+  color: #27ae60;
+  font-size: 1.1rem;
+}
+
+.acoes-caixa {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-cancelar {
+  background: #95a5a6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancelar:hover {
+  background: #7f8c8d;
+  transform: translateY(-2px);
+}
+
+.btn-finalizar {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-finalizar:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+}
+
+.btn-finalizar:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .caixa-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .formas-pagamento {
+    grid-template-columns: 1fr;
+  }
+  
+  .acoes-caixa {
+    grid-template-columns: 1fr;
+  }
+  
+  .caixa-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+}

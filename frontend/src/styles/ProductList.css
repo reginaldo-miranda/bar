@@ -1,0 +1,219 @@
+.product-list-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.product-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.product-list-header h1 {
+  color: #2c3e50;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.product-list-container .btn-new-product {
+  background-color: #27ae60 !important;
+  color: white !important;
+  border: none !important;
+  padding: 5px 18px !important;
+  border-radius: 0px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  transition: all 0.3s ease !important;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit !important;
+}
+
+.product-list-container .btn-new-product:hover {
+  background-color: #229954 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+  border-color: #229954 !important;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #7f8c8d;
+}
+
+.error-message {
+  background-color: #fee;
+  color: #c0392b;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 4px solid #e74c3c;
+  font-weight: 500;
+}
+
+.no-products {
+  text-align: center;
+  padding: 60px 20px;
+  color: #7f8c8d;
+}
+
+.no-products p {
+  font-size: 18px;
+  margin: 0;
+}
+
+.products-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  font-size: 14px;
+}
+
+.products-table thead.products-table th {
+  background-color: #34495e;
+  color: white;
+  padding: 10px 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.products-table td {
+  padding: 8px;
+  border-bottom: 1px solid #ecf0f1;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+.products-table tbody tr:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.products-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status.active {
+  background-color: #d5f4e6;
+  color: #27ae60;
+}
+
+.status.inactive {
+  background-color: #fadbd8;
+  color: #e74c3c;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.product-list-container .btn-edit,
+.product-list-container .btn-delete {
+  padding: 2px 20px !important;
+  border: none !important;
+  border-radius: 0px !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  transition: all 0.2s ease !important;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  font-family: inherit !important;
+  min-width: 50px !important;
+  height: 20px !important;
+}
+
+.product-list-container .btn-edit {
+  background-color: #3498db !important;
+  color: white !important;
+}
+
+.product-list-container .btn-edit:hover {
+  background-color: #2980b9 !important;
+  transform: translateY(-1px);
+  border-color: #2980b9 !important;
+}
+
+.product-list-container .btn-delete {
+  background-color: #e74c3c !important;
+  color: white !important;
+}
+
+.product-list-container .btn-delete:hover {
+  background-color: #c0392b !important;
+  transform: translateY(-1px);
+  border-color: #c0392b !important;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .product-list-container {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .product-list-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+  
+  .product-list-header h1 {
+    font-size: 24px;
+    text-align: center;
+  }
+  
+  .products-table {
+    font-size: 12px;
+  }
+  
+  .products-table th,
+  .products-table td {
+    padding: 8px 6px;
+  }
+  
+  .actions {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .btn-edit,
+  .btn-delete {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}

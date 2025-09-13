@@ -1,0 +1,103 @@
+/* Employee.css */
+.employee-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.employee-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.top-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.ativo-label {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: #333;
+}
+
+.ativo-label input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.2);
+}
+
+.employee-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.employee-container input,
+.employee-container select {
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.employee-container input:focus,
+.employee-container select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.employee-container button {
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.employee-container button:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  border: 1px solid #f5c6cb;
+  text-align: center;
+}
+
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 12px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  border: 1px solid #c3e6cb;
+  text-align: center;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .employee-container {
+    padding: 15px;
+    max-width: 100%;
+  }
+  
+  .employee-container input,
+  .employee-container select,
+  .employee-container button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}

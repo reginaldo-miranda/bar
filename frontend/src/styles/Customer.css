@@ -1,0 +1,196 @@
+.customer-container {
+  max-width: 650px;
+  margin: 10px auto 30px auto;
+  padding: 20px 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.customer-container h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Header para páginas de edição */
+.customer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.customer-header h1 {
+  color: #2c3e50;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Formulário específico para edição */
+.customer-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.checkbox-group {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: normal;
+}
+
+.submit-button {
+  grid-column: 1 / -1;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+/* Linha superior com checkbox Ativo */
+.top-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Checkbox Ativo */
+.ativo-label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  gap: 5px;
+}
+
+/* Formulário em grid */
+.customer-container form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 15px;
+}
+
+/* Campos de input, select */
+.customer-container input,
+.customer-container select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.customer-container input:focus,
+.customer-container select:focus {
+  border-color: #2c3e50;
+  outline: none;
+}
+
+/* Campos que ocupam toda a linha */
+.customer-container input[name="nome"],
+.customer-container input[name="endereco"] {
+  grid-column: span 2;
+}
+
+/* Botão ocupa duas colunas */
+.customer-container button {
+  grid-column: span 2;
+  padding: 12px;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.customer-container button:hover {
+  background-color: #34495e;
+  transform: translateY(-2px);
+}
+
+/* Mensagens de erro e sucesso */
+.error-message {
+  grid-column: span 2;
+  color: #e74c3c;
+  background-color: #fdf2f2;
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 4px solid #e74c3c;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.success-message {
+  grid-column: span 2;
+  color: #27ae60;
+  background-color: #f2fdf2;
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 4px solid #27ae60;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+  .customer-container {
+    margin: 10px 15px;
+    padding: 15px;
+  }
+  
+  .customer-container form {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .customer-container input[name="nome"],
+  .customer-container input[name="endereco"],
+  .customer-container button,
+  .error-message,
+  .success-message {
+    grid-column: span 1;
+  }
+}

@@ -56,11 +56,11 @@ router.get("/:id", async (req, res) => {
 // Rota para atualizar produto
 router.put("/update/:id", async (req, res) => {
   try {
-    const { nome, descricao, precoCusto, precoVenda, grupo, unidade, ativo, dadosFiscais, quantidade } = req.body;
+    const { nome, descricao, precoCusto, precoVenda, categoria, grupo, unidade, ativo, dadosFiscais, quantidade } = req.body;
     
     const produtoAtualizado = await Product.findByIdAndUpdate(
       req.params.id,
-      { nome, descricao, precoCusto, precoVenda, grupo, unidade, ativo, dadosFiscais, quantidade },
+      { nome, descricao, precoCusto, precoVenda, categoria, grupo, unidade, ativo, dadosFiscais, quantidade },
       { new: true }
     );
 

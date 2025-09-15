@@ -5,7 +5,7 @@ import './Caixa.css';
 const Caixa = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { comanda } = location.state || {};
+  const { comanda, origem } = location.state || {};
   
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
@@ -66,7 +66,7 @@ const Caixa = () => {
       if (response.ok) {
         setSucesso('Venda finalizada com sucesso!');
         setTimeout(() => {
-          navigate('/comandas');
+          navigate(origem || '/comandas');
         }, 2000);
       } else {
         const errorData = await response.json();
@@ -80,7 +80,7 @@ const Caixa = () => {
   };
 
   const cancelar = () => {
-    navigate('/comandas');
+    navigate(origem || '/comandas');
   };
 
   if (!comanda) {

@@ -176,7 +176,7 @@ const Comandas = () => {
   const fecharComanda = (comandaId) => {
     const comanda = comandas.find(c => c._id === comandaId) || vendaAtual;
     if (comanda) {
-      navigate('/caixa', { state: { comanda } });
+      navigate('/caixa', { state: { comanda, origem: '/comandas' } });
     }
   };
 

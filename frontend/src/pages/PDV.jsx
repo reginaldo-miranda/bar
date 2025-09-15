@@ -4,22 +4,25 @@ import './PDV.css';
 const PDV = () => {
   // Estados principais
   const [funcionarios, setFuncionarios] = useState([]);
-  const [clientes, setClientes] = useState([]);
-  const [produtos, setProdutos] = useState([]);
+
   const [mesas, setMesas] = useState([]);
   const [vendaAtual, setVendaAtual] = useState(null);
   
   // Estados de seleção
-  const [funcionarioSelecionado, setFuncionarioSelecionado] = useState('');
   const [mesaSelecionada, setMesaSelecionada] = useState('');
-  const [clienteSelecionado, setClienteSelecionado] = useState('');
   const [tipoVenda, setTipoVenda] = useState('balcao'); // balcao, mesa, delivery
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState('todos');
   
   // Estados de produto
-  const [quantidade, setQuantidade] = useState(1);
+  const [produtos, setProdutos] = useState([]);
+  const [produtosSelecionados, setProdutosSelecionados] = useState([]);
+  const [funcionarioBalcao, setFuncionarioBalcao] = useState('');
   const [desconto, setDesconto] = useState(0);
+  const [quantidade, setQuantidade] = useState(1);
   const [buscarProduto, setBuscarProduto] = useState('');
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState('todos');
+  const [categorias, setCategorias] = useState([
+    { id: 'todos', nome: 'Todos', icon: '🍽️' }
+  ]);
   
   // Estados de controle
   const [loading, setLoading] = useState(false);
@@ -38,10 +41,7 @@ const PDV = () => {
   const [tipoMesaSelecionado, setTipoMesaSelecionado] = useState('todos');
 
   
-  // Categorias de produtos (dinâmicas baseadas nos grupos)
-  const [categorias, setCategorias] = useState([
-    { id: 'todos', nome: 'Todos', icon: '🍽️' }
-  ]);
+
 
   // Tipos de mesa
   const tiposMesa = [
@@ -56,10 +56,8 @@ const PDV = () => {
   // Carregar dados iniciais
   useEffect(() => {
     carregarFuncionarios();
-    carregarClientes();
     carregarProdutos();
     carregarMesas();
-
   }, []);
 
   const carregarFuncionarios = async () => {
@@ -74,17 +72,7 @@ const PDV = () => {
     }
   };
 
-  const carregarClientes = async () => {
-    try {
-      const response = await fetch('http://localhost:4000/api/customer/list');
-      if (response.ok) {
-        const data = await response.json();
-        setClientes(data.filter(cli => cli.ativo));
-      }
-    } catch {
-      console.error('Erro ao carregar clientes');
-    }
-  };
+
 
   const carregarMesas = async () => {
     try {
@@ -137,18 +125,19 @@ const PDV = () => {
     }
   };
 
+
+
   const carregarProdutos = async () => {
     try {
       const response = await fetch('http://localhost:4000/api/product/list');
       if (response.ok) {
         const data = await response.json();
-        const produtosAtivos = data.filter(prod => prod.ativo);
+        const produtosAtivos = data.filter(prod => prod.ativo && !prod.oculto);
         setProdutos(produtosAtivos);
         
-        // Extrair grupos únicos dos produtos para criar categorias dinâmicas
-        const gruposUnicos = [...new Set(produtosAtivos
-          .map(produto => produto.grupo)
-          .filter(grupo => grupo && grupo.trim() !== '')
+        // Criar categorias baseadas nos grupos dos produtos
+        const gruposUnicos = [...new Set(
+          produtosAtivos.map(produto => produto.grupo).filter(Boolean)
         )];
         
         // Mapear grupos para categorias com ícones
@@ -177,9 +166,121 @@ const PDV = () => {
     }
   };
 
+  // Função para adicionar produto com quantidade específica (similar à comanda)
+  const adicionarItem = (produto) => {
+    const produtoExistente = produtosSelecionados.find(p => p.id === produto.id);
+    if (produtoExistente) {
+      setProdutosSelecionados(produtosSelecionados.map(p => 
+        p.id === produto.id 
+          ? { ...p, quantidade: p.quantidade + quantidade }
+          : p
+      ));
+    } else {
+      setProdutosSelecionados([...produtosSelecionados, { ...produto, quantidade: quantidade }]);
+    }
+    setSucesso(`${produto.nome} adicionado (${quantidade}x)!`);
+    setTimeout(() => setSucesso(''), 2000);
+  };
+
+
+
+  // Função para limpar venda
+  const limparVenda = () => {
+    setProdutosSelecionados([]);
+    setDesconto(0);
+    setQuantidade(1);
+    setBuscarProduto('');
+    setCategoriaSelecionada('todos');
+  };
+
+  // Filtrar produtos baseado na categoria e busca
+  const produtosFiltrados = produtos.filter(produto => {
+    const matchCategoria = categoriaSelecionada === 'todos' || produto.grupo === categoriaSelecionada;
+    const matchBusca = produto.nome.toLowerCase().includes(buscarProduto.toLowerCase());
+    return matchCategoria && matchBusca;
+  });
+
+  // Função para calcular subtotal
+  const calcularSubtotal = () => {
+    return produtosSelecionados.reduce((total, produto) => {
+      return total + ((produto.preco || 0) * (produto.quantidade || 1));
+    }, 0);
+  };
+
+  // Função para calcular desconto
+  const calcularDesconto = () => {
+    return calcularSubtotal() * (desconto / 100);
+  };
+
+  // Função para calcular total final
+  const calcularTotalFinal = () => {
+    return calcularSubtotal() - calcularDesconto();
+  };
+
+  // Função para calcular total simples (compatibilidade)
+  const calcularTotalSimples = () => {
+    return calcularTotalFinal();
+  };
+
+  const finalizarVendaBalcaoSimples = async () => {
+    if (!funcionarioBalcao) {
+      setErro('Selecione um funcionário para finalizar a venda');
+      return;
+    }
+
+    if (produtosSelecionados.length === 0) {
+      setErro('Selecione pelo menos um produto para finalizar a venda');
+      return;
+    }
+
+    setLoading(true);
+    setErro('');
+
+    try {
+      const vendaData = {
+        funcionario_id: funcionarioBalcao,
+        cliente_id: null,
+        tipo: 'balcao',
+        desconto: desconto,
+        total: calcularTotalSimples(),
+        itens: produtosSelecionados.map(produto => ({
+          produto_id: produto.id,
+          quantidade: produto.quantidade || 1,
+          preco_unitario: produto.preco,
+          subtotal: (produto.preco || 0) * (produto.quantidade || 1)
+        }))
+      };
+
+      const response = await fetch('http://localhost:4000/api/sale/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(vendaData)
+      });
+
+      if (response.ok) {
+        setSucesso('Venda finalizada com sucesso!');
+        setProdutosSelecionados([]);
+        setDesconto(0);
+        setFuncionarioBalcao('');
+        
+        // Limpar mensagem de sucesso após 3 segundos
+        setTimeout(() => setSucesso(''), 3000);
+      } else {
+        const errorData = await response.json();
+        setErro(errorData.error || 'Erro ao finalizar venda');
+      }
+    } catch {
+      setErro('Erro ao conectar com o servidor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const iniciarNovaVenda = async () => {
-    if (!funcionarioSelecionado || !clienteSelecionado) {
-      setErro('Selecione um funcionário e um cliente para iniciar a venda');
+    if (!funcionarioBalcao) {
+      setErro('Selecione um funcionário para iniciar a venda');
       return;
     }
 
@@ -194,8 +295,8 @@ const PDV = () => {
     
     try {
       const dadosVenda = {
-        funcionario: funcionarioSelecionado,
-        cliente: clienteSelecionado,
+        funcionario: funcionarioBalcao,
+        cliente: '',
         tipoVenda: tipoVenda
       };
 
@@ -228,79 +329,7 @@ const PDV = () => {
     }
   };
 
-  const adicionarItem = async (produto) => {
-    if (!vendaAtual) {
-      setErro('Inicie uma venda primeiro');
-      return;
-    }
 
-    if (!produto) {
-      setErro('Produto inválido');
-      return;
-    }
-
-    setLoading(true);
-    setErro('');
-
-    try {
-      // Verificar se o item já existe na venda
-      const itemExistente = vendaAtual.itens?.find(item => item.produto._id === produto._id);
-      
-      if (itemExistente) {
-        // Se existe, incrementar quantidade
-        const novaQuantidade = itemExistente.quantidade + quantidade;
-        const response = await fetch(`http://localhost:4000/api/sale/${vendaAtual._id}/item/${itemExistente._id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            quantidade: novaQuantidade
-          })
-        });
-
-        if (response.ok) {
-          const vendaAtualizada = await response.json();
-          setVendaAtual(vendaAtualizada);
-          setQuantidade(1);
-          setBuscarProduto('');
-          setSucesso(`Quantidade de ${produto.nome} atualizada!`);
-          setTimeout(() => setSucesso(''), 2000);
-        } else {
-          const errorData = await response.json();
-          setErro(errorData.error || 'Erro ao atualizar quantidade');
-        }
-      } else {
-        // Se não existe, adicionar novo item
-        const response = await fetch(`http://localhost:4000/api/sale/${vendaAtual._id}/item`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            produtoId: produto._id,
-            quantidade: quantidade
-          })
-        });
-
-        if (response.ok) {
-          const vendaAtualizada = await response.json();
-          setVendaAtual(vendaAtualizada);
-          setQuantidade(1);
-          setBuscarProduto('');
-          setSucesso(`${produto.nome} adicionado ao pedido!`);
-          setTimeout(() => setSucesso(''), 2000);
-        } else {
-          const errorData = await response.json();
-          setErro(errorData.error || 'Erro ao adicionar item');
-        }
-      }
-    } catch {
-      setErro('Erro ao conectar com o servidor');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const salvarVenda = async () => {
     if (!vendaAtual) return;
@@ -344,44 +373,7 @@ const PDV = () => {
     }
   };
 
-  const removerItemProduto = async (produto) => {
-    if (!vendaAtual) return;
-    
-    const itemExistente = vendaAtual.itens?.find(item => item.produto._id === produto._id);
-    if (!itemExistente) return;
-    
-    if (itemExistente.quantidade > 1) {
-      // Se tem mais de 1, diminui a quantidade
-      setLoading(true);
-      try {
-        const response = await fetch(`http://localhost:4000/api/sale/${vendaAtual._id}/item`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            produtoId: produto._id,
-            quantidade: -1
-          })
-        });
 
-        if (response.ok) {
-          const vendaAtualizada = await response.json();
-          setVendaAtual(vendaAtualizada);
-        } else {
-          const errorData = await response.json();
-          setErro(errorData.error || 'Erro ao remover item');
-        }
-      } catch {
-        setErro('Erro ao conectar com o servidor');
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Se tem apenas 1, remove completamente
-      await removerItem(produto._id);
-    }
-  };
 
   // Função para atualizar quantidade (implementar quando necessário)
   // const atualizarQuantidade = async (produtoId, novaQuantidade) => {
@@ -410,8 +402,6 @@ const PDV = () => {
       if (response.ok) {
         setSucesso('Venda finalizada com sucesso!');
         setVendaAtual(null);
-        setFuncionarioSelecionado('');
-        setClienteSelecionado('');
         setDesconto(0);
 
         setTimeout(() => setSucesso(''), 3000);
@@ -440,8 +430,6 @@ const PDV = () => {
         if (response.ok) {
           setSucesso('Venda cancelada!');
           setVendaAtual(null);
-          setFuncionarioSelecionado('');
-          setClienteSelecionado('');
           setDesconto(0);
           setTimeout(() => setSucesso(''), 3000);
         }
@@ -451,12 +439,7 @@ const PDV = () => {
     }
   };
 
-  // Filtrar produtos por categoria
-  const produtosFiltrados = produtos.filter(produto => {
-    const matchCategoria = categoriaSelecionada === 'todos' || produto.grupo === categoriaSelecionada;
-    const matchBusca = produto.nome.toLowerCase().includes(buscarProduto.toLowerCase());
-    return matchCategoria && matchBusca && produto.ativo && produto.disponivel;
-  });
+
 
   return (
     <div className="pdv-container">
@@ -478,48 +461,39 @@ const PDV = () => {
       {erro && <div className="erro-message">{erro}</div>}
       {sucesso && <div className="sucesso-message">{sucesso}</div>}
 
+      {/* Botões de Navegação */}
+      <div className="pdv-navigation">
+        <button 
+          className={`nav-btn ${tipoVenda === 'balcao' ? 'active' : ''}`}
+          onClick={() => setTipoVenda('balcao')}
+        >
+          🏪 Venda Balcão
+        </button>
+        <button 
+          className="nav-btn"
+          onClick={() => window.location.href = '/mesas'}
+        >
+          🪑 Mesa
+        </button>
+        <button 
+          className={`nav-btn ${tipoVenda === 'delivery' ? 'active' : ''}`}
+          onClick={() => setTipoVenda('delivery')}
+        >
+          🚚 Delivery
+        </button>
+        <button 
+          className="nav-btn"
+          onClick={() => window.location.href = '/comandas'}
+        >
+          📋 Comanda
+        </button>
+      </div>
+
       <div className="pdv-layout">
         {/* Painel Esquerdo - Controles */}
         <div className="pdv-left-panel">
-          {/* Tipo de Venda */}
-          <div className="pdv-section">
-            <h3>📍 Tipo de Venda</h3>
-            <div className="tipo-venda-buttons">
-              <button 
-                className={`tipo-btn ${tipoVenda === 'balcao' ? 'active' : ''}`}
-                onClick={() => setTipoVenda('balcao')}
-              >
-                🏪 Balcão
-              </button>
-              <button 
-                className={`tipo-btn ${tipoVenda === 'mesa' ? 'active' : ''}`}
-                onClick={() => setTipoVenda('mesa')}
-              >
-                🪑 Mesa
-              </button>
 
-              <button 
-                className={`tipo-btn ${tipoVenda === 'delivery' ? 'active' : ''}`}
-                onClick={() => setTipoVenda('delivery')}
-              >
-                🚚 Delivery
-              </button>
-              <button 
-                className="btn-comandas"
-                onClick={() => window.location.href = '/comandas'}
-              >
-                📋 Comandas
-              </button>
-              <button 
-                className="btn-mesas"
-                onClick={() => window.location.href = '/mesas'}
-              >
-                🪑 Mesas
-              </button>
-            </div>
-          </div>
-
-          {/* Seleção de Mesa (se tipo mesa) */}
+          {/* Seleção de Mesa (apenas se tipo for mesa e não for balcão) */}
           {tipoVenda === 'mesa' && (
             <div className="pdv-section">
               <div className="mesas-header">
@@ -577,111 +551,9 @@ const PDV = () => {
 
 
 
-          {/* Seleção de Funcionário e Cliente */}
+          {/* Botões de Ação Principal */}
           <div className="pdv-section">
-            <h3>👤 Atendimento</h3>
-            <div className="selection-inputs">
-              <div className="input-group">
-                <label>Funcionário:</label>
-                <select 
-                  value={funcionarioSelecionado} 
-                  onChange={(e) => setFuncionarioSelecionado(e.target.value)}
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  {funcionarios.map(func => (
-                    <option key={func._id} value={func._id}>
-                      {func.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="input-group">
-                <label>Cliente:</label>
-                <select 
-                  value={clienteSelecionado} 
-                  onChange={(e) => setClienteSelecionado(e.target.value)}
-                >
-                  <option value="">Cliente avulso</option>
-                  {clientes.map(cliente => (
-                    <option key={cliente._id} value={cliente._id}>
-                      {cliente.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Itens da Venda */}
-          <div className="pdv-section items-section">
-            <h3>📋 Pedido</h3>
-            <div className="items-container">
-              {vendaAtual && vendaAtual.itens && vendaAtual.itens.length > 0 ? (
-                <div className="items-list">
-                  {vendaAtual.itens.map((item, index) => (
-                    <div key={index} className="item-card">
-                      <div className="item-info">
-                        <div className="item-name">{item.nomeProduto}</div>
-                        <div className="item-details">
-                          <span className="item-qty">{item.quantidade}x</span>
-                          <span className="item-price">R$ {item.precoUnitario.toFixed(2)}</span>
-                        </div>
-                      </div>
-                      <div className="item-actions">
-                        <span className="item-total">R$ {item.subtotal.toFixed(2)}</span>
-                        <button 
-                          onClick={() => removerItem(item.produto)}
-                          className="remove-btn"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="no-items">
-                  <p>🍽️ Nenhum item no pedido</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Totais e Ações */}
-          <div className="pdv-section totals-actions">
-            <div className="totals">
-              <div className="discount-input">
-                <label>Desconto (%):</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={desconto}
-                  onChange={(e) => setDesconto(Number(e.target.value))}
-                />
-              </div>
-              
-              <div className="totals-display">
-                <div className="total-row">
-                  <span>Subtotal:</span>
-                  <span>R$ {vendaAtual ? vendaAtual.subtotal.toFixed(2) : '0.00'}</span>
-                </div>
-                {desconto > 0 && (
-                  <div className="total-row discount">
-                    <span>Desconto ({desconto}%):</span>
-                    <span>-R$ {vendaAtual ? (vendaAtual.subtotal * desconto / 100).toFixed(2) : '0.00'}</span>
-                  </div>
-                )}
-                <div className="total-row total-final">
-                  <span>Total:</span>
-                  <span>R$ {vendaAtual ? (vendaAtual.subtotal * (1 - desconto / 100)).toFixed(2) : '0.00'}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="action-buttons">
+            <div className="action-buttons-main">
               <button 
                 onClick={iniciarNovaVenda}
                 className="btn btn-new"
@@ -714,19 +586,79 @@ const PDV = () => {
                 ❌ Cancelar
               </button>
             </div>
+            
+            {/* Total */}
+            <div className="totals">
+              <div className="totals-display">
+                <div className="total-row total-final">
+                  <span>Total:</span>
+                  <span>R$ {vendaAtual ? vendaAtual.subtotal.toFixed(2) : '0.00'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Itens da Venda */}
+          <div className="pdv-section items-section">
+            <div className="items-container">
+              {vendaAtual && vendaAtual.itens && vendaAtual.itens.length > 0 ? (
+                <div className="items-list">
+                  {vendaAtual.itens.map((item, index) => (
+                    <div key={`${item.produto}-${index}`} className="item-card">
+                      <div className="item-info">
+                        <div className="item-name">{item.nomeProduto}</div>
+                        <div className="item-details">
+                          <span className="item-qty">{item.quantidade}x</span>
+                          <span className="item-price">R$ {item.precoUnitario.toFixed(2)}</span>
+                        </div>
+                      </div>
+                      <div className="item-actions">
+                        <span className="item-total">R$ {item.subtotal.toFixed(2)}</span>
+                        <button 
+                          onClick={() => removerItem(item.produto)}
+                          className="remove-btn"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-items">
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Painel Direito - Produtos */}
+        {/* Painel Direito - Venda Balcão */}
         <div className="pdv-right-panel">
-          {/* Categorias */}
-          <div className="categorias-section">
-            <h3>🍽️ Categorias</h3>
-            <div className="categorias-grid">
+          <div className="venda-balcao-nova">
+            <div className="venda-header">
+              <h2>💰 Ponto de Venda</h2>
+              <div className="funcionario-select">
+                <select
+                   value={funcionarioBalcao}
+                   onChange={(e) => setFuncionarioBalcao(e.target.value)}
+                   className="select-funcionario-novo"
+                 >
+                   <option value="">Selecionar Funcionário</option>
+                   {funcionarios.map((funcionario) => (
+                     <option key={funcionario._id} value={funcionario._id}>
+                       {funcionario.nome}
+                     </option>
+                   ))}
+                 </select>
+              </div>
+            </div>
+
+            {/* Filtros de categoria */}
+            <div className="filtros-categoria">
               {categorias.map(categoria => (
                 <button
                   key={categoria.id}
-                  className={`categoria-btn ${categoriaSelecionada === categoria.id ? 'active' : ''}`}
+                  className={`btn-categoria ${categoriaSelecionada === categoria.id ? 'ativo' : ''}`}
                   onClick={() => setCategoriaSelecionada(categoria.id)}
                 >
                   <span className="categoria-icon">{categoria.icon}</span>
@@ -734,63 +666,88 @@ const PDV = () => {
                 </button>
               ))}
             </div>
-          </div>
 
-          {/* Busca */}
-          <div className="busca-section">
-            <input
-              type="text"
-              placeholder="🔍 Buscar produto..."
-              value={buscarProduto}
-              onChange={(e) => setBuscarProduto(e.target.value)}
-              className="busca-input"
-            />
-          </div>
-
-          {/* Lista de Produtos */}
-          <div className="produtos-section">
-            <div className="produtos-lista">
-              {produtosFiltrados.map(produto => (
-                <div key={produto._id} className="produto-item">
-                  <div className="produto-detalhes">
-                    <div className="produto-nome">{produto.nome}</div>
-                    <div className="produto-descricao">{produto.descricao || 'Sem descrição'}</div>
-                    <div className="produto-info-linha">
-                      <span className="produto-unidade">Unidade: {produto.unidade || 'UN'}</span>
-                      <span className="produto-preco">R$ {produto.precoVenda.toFixed(2)}</span>
-                    </div>
-                    {produto.quantidade <= 5 && (
-                      <div className="produto-estoque-baixo">Estoque baixo: {produto.quantidade}</div>
-                    )}
-                  </div>
-                  <div className="produto-acoes">
-                    <button 
-                      onClick={() => removerItemProduto(produto)}
-                      className="produto-btn produto-btn-remover"
-                      disabled={!vendaAtual || !vendaAtual.itens?.find(item => item.produto._id === produto._id)}
-                    >
-                      ➖
-                    </button>
-                    <span className="produto-quantidade">
-                      {vendaAtual?.itens?.find(item => item.produto._id === produto._id)?.quantidade || 0}
-                    </span>
-                    <button 
-                      onClick={() => adicionarItem(produto)}
-                      className="produto-btn produto-btn-adicionar"
-                      disabled={produto.quantidade === 0}
-                    >
-                      ➕
-                    </button>
-                  </div>
+            {/* Busca de produtos e controle de quantidade */}
+            <div className="busca-produtos">
+              <div className="busca-input-group">
+                <input
+                  type="text"
+                  placeholder="Buscar produto..."
+                  value={buscarProduto}
+                  onChange={(e) => setBuscarProduto(e.target.value)}
+                  className="input-busca"
+                />
+                <div className="quantidade-controls">
+                  <label>Qtd:</label>
+                  <button 
+                    className="btn-qtd" 
+                    onClick={() => setQuantidade(Math.max(1, quantidade - 1))}
+                  >
+                    -
+                  </button>
+                  <span className="quantidade-display">{quantidade}</span>
+                  <button 
+                    className="btn-qtd" 
+                    onClick={() => setQuantidade(quantidade + 1)}
+                  >
+                    +
+                  </button>
                 </div>
-              ))}
-            </div>
-            
-            {produtosFiltrados.length === 0 && (
-              <div className="no-products">
-                <p>🔍 Nenhum produto encontrado</p>
               </div>
-            )}
+            </div>
+
+            {/* Grade de Produtos */}
+            <div className="produtos-grid-container">
+              <div className="produtos-grid">
+                {produtosFiltrados.map(produto => {
+                  const produtoSelecionado = produtosSelecionados.find(p => p.id === produto.id);
+                  const quantidadeSelecionada = produtoSelecionado ? produtoSelecionado.quantidade || 1 : 0;
+                  return (
+                    <div key={produto.id} className="produto-card">
+                      <div className="produto-card-header">
+                        <h4>{produto.nome}</h4>
+                        <span className="produto-preco">R$ {produto.preco ? produto.preco.toFixed(2) : '0.00'}</span>
+                      </div>
+                      <div className="produto-card-body">
+                        <p className="produto-descricao">{produto.descricao}</p>
+                        <p className="produto-grupo">{produto.grupo}</p>
+                        {quantidadeSelecionada > 0 && (
+                          <div className="produto-selecionado">
+                            <span>Selecionado: {quantidadeSelecionada}x</span>
+                          </div>
+                        )}
+                        <button 
+                          className="btn-adicionar-item"
+                          onClick={() => adicionarItem(produto)}
+                        >
+                          Adicionar ({quantidade}x)
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+
+
+            {/* Botões de Ação */}
+            <div className="acoes-panel">
+              <button
+                onClick={limparVenda}
+                className="btn-limpar"
+                disabled={produtosSelecionados.length === 0}
+              >
+                🗑️ Limpar
+              </button>
+              <button
+                onClick={finalizarVendaBalcaoSimples}
+                disabled={loading || produtosSelecionados.length === 0 || !funcionarioBalcao}
+                className="btn-finalizar-novo"
+              >
+                {loading ? '⏳ Finalizando...' : '✅ Finalizar Venda'}
+              </button>
+            </div>
           </div>
         </div>
       </div>

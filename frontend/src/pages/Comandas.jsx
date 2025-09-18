@@ -161,7 +161,10 @@ const Comandas = () => {
         carregarComandas();
         setVendaAtual(novaVenda);
         setComandaSelecionada(novaVenda._id);
-        setTimeout(() => setSucesso(''), 3000);
+        setTimeout(() => {
+          setSucesso('');
+          navigate('/pdv'); // Fechar a tela e voltar ao PDV
+        }, 2000);
       } else {
         const errorData = await response.json();
         setErro(errorData.message || 'Erro ao criar comanda');

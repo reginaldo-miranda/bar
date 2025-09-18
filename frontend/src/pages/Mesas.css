@@ -1,8 +1,15 @@
-/* Container Principal */
+/* Mesas Container */
 .mesas-container {
-  padding: 20px;
-  background: #f8f9fa;
+  width: 100vw;
   min-height: 100vh;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 70px 10px 10px 10px; /* 70px top para respeitar o header de 60px + margem */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* Header */
@@ -10,23 +17,23 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  padding: 20px;
+  margin-bottom: 10px;
   background: white;
-  border-radius: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .mesas-header h1 {
   margin: 0;
   color: #2c3e50;
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.4rem;
 }
 
 .header-actions {
   display: flex;
-  gap: 15px;
+  gap: 10px;
 }
 
 .btn-nova-mesa {
@@ -35,7 +42,6 @@
   border: none;
   padding: 12px 20px;
   border-radius: 8px;
-  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -48,189 +54,173 @@
 }
 
 .btn-voltar-pdv {
-  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   color: white;
   border: none;
   padding: 12px 20px;
   border-radius: 8px;
-  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
 }
 
 .btn-voltar-pdv:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(149, 165, 166, 0.4);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
 }
 
-/* Mensagens */
+/* Messages */
 .erro-msg {
   background: #e74c3c;
   color: white;
-  padding: 15px;
+  padding: 12px 20px;
   border-radius: 8px;
   margin-bottom: 20px;
+  text-align: center;
   font-weight: 600;
 }
 
 .sucesso-msg {
   background: #27ae60;
   color: white;
-  padding: 15px;
+  padding: 12px 20px;
   border-radius: 8px;
   margin-bottom: 20px;
+  text-align: center;
   font-weight: 600;
 }
 
-/* Layout Principal */
+/* Layout */
 .mesas-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Lista de Mesas */
+.mesas-lista {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
-/* Seção de Filtros */
-.filtros-section {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.filtros-section h3 {
+.mesas-lista h3 {
   margin: 0 0 15px 0;
   color: #2c3e50;
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.1rem;
 }
 
-/* Filtros de Tipo de Mesa */
-.tipos-mesa-filtro {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tipo-mesa-btn {
-  background: #ecf0f1;
-  border: 2px solid #bdc3c7;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  font-weight: 500;
-}
-
-.tipo-mesa-btn:hover {
-  background: #d5dbdb;
-  border-color: #95a5a6;
-}
-
-.tipo-mesa-btn.active {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  color: white;
-  border-color: #2980b9;
-}
-
-/* Container do Grid de Mesas */
-.mesas-grid-container {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.mesas-grid-container h3 {
-  margin: 0 0 20px 0;
-  color: #2c3e50;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-/* Grid de Mesas */
 .mesas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
 }
 
-/* Card da Mesa */
 .mesa-card {
   border: 2px solid #ecf0f1;
   border-radius: 12px;
-  padding: 20px;
-  background: white;
+  overflow: hidden;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  background: white;
+  position: relative;
+  isolation: isolate;
+  contain: layout style;
 }
 
 .mesa-card:hover {
+  border-color: #3498db !important;
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3) !important;
+  background: #e3f2fd !important;
 }
 
-.mesa-card.livre {
+.mesa-card:hover .mesa-info {
+  background: #e3f2fd !important;
+}
+
+.mesa-card:hover .mesa-detalhes {
+  background: #e3f2fd !important;
+}
+
+.mesa-card:hover .mesa-numero,
+.mesa-card:hover .mesa-nome,
+.mesa-card:hover .mesa-tipo,
+.mesa-card:hover .mesa-capacidade,
+.mesa-card:hover .mesa-status-badge {
+  background: transparent !important;
+}
+
+.mesa-card.selected {
   border-color: #27ae60;
-  background: linear-gradient(135deg, #d5f4e6 0%, #ffffff 100%);
+  background: #f8fff9;
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);
 }
 
-.mesa-card.ocupada {
-  border-color: #e74c3c;
-  background: linear-gradient(135deg, #fdeaea 0%, #ffffff 100%);
-}
-
-.mesa-card.reservada {
-  border-color: #f39c12;
-  background: linear-gradient(135deg, #fef5e7 0%, #ffffff 100%);
-}
-
-.mesa-card.manutencao {
-  border-color: #95a5a6;
-  background: linear-gradient(135deg, #f4f6f7 0%, #ffffff 100%);
-}
-
-/* Informações da Mesa */
 .mesa-info {
-  margin-bottom: 15px;
+  padding: 10px 20px 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: transparent;
+  min-height: 65px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mesa-detalhes {
+  flex: 1;
+  cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
+  max-width: calc(100% - 80px);
 }
 
 .mesa-numero {
-  font-size: 1.4rem;
   font-weight: 700;
+  font-size: 0.95rem;
   color: #2c3e50;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+  line-height: 1.2;
 }
 
 .mesa-nome {
-  font-size: 1.1rem;
+  font-size: 0.8rem;
   color: #34495e;
-  margin-bottom: 8px;
-  font-weight: 600;
+  margin-bottom: 3px;
+  font-weight: 500;
 }
 
 .mesa-tipo {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: #7f8c8d;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
   text-transform: capitalize;
 }
 
 .mesa-capacidade {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: #7f8c8d;
-  margin-bottom: 8px;
+  margin-bottom: 3px;
 }
 
 .mesa-status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 10px;
   font-weight: 600;
-  margin-bottom: 8px;
+  text-align: center;
+  margin-bottom: 2px;
 }
 
 .mesa-status-badge.livre {
@@ -239,101 +229,327 @@
 }
 
 .mesa-status-badge.ocupada {
-  background: #fdeaea;
-  color: #e74c3c;
+  background: #ffeaa7;
+  color: #e17055;
 }
 
 .mesa-status-badge.reservada {
-  background: #fef5e7;
-  color: #f39c12;
+  background: #ddd6fe;
+  color: #8b5cf6;
 }
 
-.mesa-status-badge.manutencao {
-  background: #f4f6f7;
-  color: #95a5a6;
+.mesa-status-badge.cancelada {
+  background: #fee2e2;
+  color: #dc2626;
+  font-weight: 700;
 }
 
-.mesa-tempo {
-  font-size: 0.85rem;
-  color: #e74c3c;
-  font-weight: 600;
-  margin-bottom: 5px;
+.mesa-responsavel {
+  font-size: 0.8rem;
+  color: #ffffff;
+  font-weight: 700;
+  margin-bottom: 4px;
+  padding: 6px 10px;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  border-radius: 8px;
+  border: 2px solid #2980b9;
+  text-transform: uppercase;
+  box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
 }
 
 .mesa-observacoes {
-  font-size: 0.85rem;
-  color: #7f8c8d;
+  font-size: 0.7rem;
+  color: #95a5a6;
   font-style: italic;
-  margin-top: 8px;
-  padding: 8px;
-  background: #f8f9fa;
-  border-radius: 6px;
-}
-
-/* Ações da Mesa */
-.mesa-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.btn-abrir-mesa {
-  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-abrir-mesa:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
-}
-
-.btn-ir-pdv {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-ir-pdv:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid #ecf0f1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .btn-fechar-mesa {
-  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
   color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-left: 8px;
+  align-self: flex-start;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  z-index: 10;
+  max-width: 60px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-fechar-mesa:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
 }
 
-/* Sem Mesas */
 .sem-mesas {
   text-align: center;
   color: #7f8c8d;
-  padding: 60px 20px;
+  padding: 40px 20px;
+}
+
+.sem-mesas p:first-child {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.sem-mesas p:last-child {
+  font-size: 0.9rem;
   font-style: italic;
+}
+
+/* Área de Produtos */
+.produtos-area {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.mesa-selecionada {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.mesa-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-fechar-mesa-fixo {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-fechar-mesa-fixo:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-fechar-mesa-fixo:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mesa-selecionada h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+}
+
+.mesa-selecionada p {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.selecione-mesa {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 60px 20px;
+}
+
+.selecione-mesa h3 {
+  margin-bottom: 10px;
+  color: #34495e;
+}
+
+.selecione-mesa p {
+  font-style: italic;
+}
+
+/* Filtros de Categoria */
+.categorias-filtro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.categoria-btn {
+  background: #ecf0f1;
+  border: 2px solid #bdc3c7;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.categoria-btn:hover {
+  background: #d5dbdb;
+  border-color: #95a5a6;
+}
+
+.categoria-btn.active {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border-color: #2980b9;
+}
+
+/* Busca de Produtos */
+.busca-produto {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.busca-produto input[type="text"] {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid #ecf0f1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.busca-produto input[type="text"]:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.quantidade-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quantidade-control label {
+  font-weight: 600;
+  color: #34495e;
+}
+
+.quantidade-control input {
+  width: 60px;
+  padding: 8px;
+  border: 2px solid #ecf0f1;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.quantidade-control input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+/* Grid de Produtos */
+.produtos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.produto-card {
+  background: white;
+  border: 2px solid #ecf0f1;
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.produto-card:hover {
+  border-color: #3498db;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
+
+.produto-info {
+  flex: 1;
+  margin-bottom: 10px;
+}
+
+.produto-info h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.produto-preco {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #27ae60;
+  margin: 0 0 8px 0;
+}
+
+.produto-descricao {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.btn-adicionar {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: stretch;
+}
+
+.btn-adicionar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn-adicionar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sem-produtos {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #7f8c8d;
+  padding: 40px 20px;
 }
 
 /* Modal */
@@ -354,9 +570,11 @@
   background: white;
   border-radius: 12px;
   width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 450px;
+  max-height: 70vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
@@ -364,15 +582,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #ecf0f1;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  background: #f8f9fa;
 }
 
 .modal-header h3 {
   margin: 0;
   color: #2c3e50;
   font-size: 1.3rem;
-  font-weight: 600;
 }
 
 .modal-close {
@@ -381,7 +599,12 @@
   font-size: 1.5rem;
   cursor: pointer;
   color: #7f8c8d;
-  padding: 5px;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   transition: all 0.3s ease;
 }
@@ -392,28 +615,29 @@
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 15px;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
-  color: #2c3e50;
+  margin-bottom: 5px;
   font-weight: 600;
-  font-size: 0.9rem;
+  color: #34495e;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 12px;
+  padding: 8px 10px;
   border: 2px solid #ecf0f1;
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   transition: border-color 0.3s ease;
   box-sizing: border-box;
 }
@@ -426,19 +650,20 @@
 
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  padding: 20px;
-  border-top: 1px solid #ecf0f1;
+  gap: 10px;
+  padding: 15px;
+  border-top: 1px solid #eee;
+  background: #f8f9fa;
 }
 
 .btn-cancelar {
+  flex: 1;
   background: #95a5a6;
   color: white;
   border: none;
-  padding: 12px 20px;
+  padding: 10px 16px;
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -446,57 +671,86 @@
 
 .btn-cancelar:hover {
   background: #7f8c8d;
+  transform: translateY(-1px);
 }
 
 .btn-criar {
+  flex: 1;
   background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
   color: white;
   border: none;
-  padding: 12px 20px;
+  padding: 10px 16px;
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.btn-criar:hover:not(:disabled) {
+.btn-criar:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
 }
 
 .btn-criar:disabled {
-  background: #bdc3c7;
+  opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
+}
+
+.btn-abrir-mesa {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-abrir-mesa:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.btn-abrir-mesa:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mesa-info-modal {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #007bff;
+}
+
+.mesa-info-modal p {
+  margin: 8px 0;
+  color: #495057;
+}
+
+.mesa-info-modal strong {
+  color: #212529;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-  .mesas-container {
-    padding: 10px;
-  }
-  
-  .mesas-header {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-  }
-  
-  .header-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .mesas-grid {
+  .mesas-layout {
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
   }
   
-  .tipos-mesa-filtro {
-    justify-content: center;
+  .produtos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
   
   .modal-content {
     width: 95%;
-    margin: 10px;
+    margin: 5px;
+    max-height: 80vh;
   }
 }

@@ -3094,6 +3094,41 @@
   color: #2d3748;
 }
 
+.input-quantidade-editavel {
+  width: 50px;
+  padding: 4px 6px;
+  border: 2px solid #e2e8f0;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d3748;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.input-quantidade-editavel:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.input-quantidade-editavel:hover {
+  border-color: #cbd5e0;
+}
+
+/* Remove setas do input number no Chrome/Safari */
+.input-quantidade-editavel::-webkit-outer-spin-button,
+.input-quantidade-editavel::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove setas do input number no Firefox */
+.input-quantidade-editavel[type=number] {
+  -moz-appearance: textfield;
+}
+
 .totais-panel {
   background: #f7fafc;
   border-radius: 8px;

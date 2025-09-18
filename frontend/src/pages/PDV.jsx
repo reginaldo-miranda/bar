@@ -784,12 +784,62 @@ const PDV = () => {
                               >
                                 −
                               </button>
-                              <span className="quantidade-atual">{quantidadeSelecionada}</span>
+                              <input 
+                                type="number"
+                                min="1"
+                                max="999"
+                                value={quantidadeSelecionada}
+                                onChange={(e) => {
+                                  const novaQuantidade = parseInt(e.target.value) || 1;
+                                  if (novaQuantidade > 0) {
+                                    const novosProdutos = [...produtosSelecionados];
+                                    const index = novosProdutos.findIndex(p => p.id === produto._id);
+                                    if (index !== -1) {
+                                      novosProdutos[index].quantidade = novaQuantidade;
+                                      setProdutosSelecionados(novosProdutos);
+                                    }
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.target.blur(); // Remove o foco do input
+                                  }
+                                }}
+                                className="input-quantidade-editavel"
+                                onFocus={(e) => e.target.select()}
+                                ref={(input) => {
+                                  if (input) {
+                                    input.dataset.produtoId = produto._id;
+                                  }
+                                }}
+                              />
                             </>
                           )}
                           <button 
                             className="btn-adicionar"
-                            onClick={() => adicionarProdutoRapido(produto)}
+                            onClick={() => {
+                              if (quantidadeSelecionada > 0) {
+                                // Se o produto já está selecionado, apenas incrementa
+                                const novosProdutos = [...produtosSelecionados];
+                                const index = novosProdutos.findIndex(p => p.id === produto._id);
+                                if (index !== -1) {
+                                  novosProdutos[index].quantidade += 1;
+                                  setProdutosSelecionados(novosProdutos);
+                                }
+                              } else {
+                                // Se o produto não está selecionado, usa a função original
+                                adicionarProdutoRapido(produto);
+                              }
+                              
+                              // Focar no input de quantidade após adicionar
+                              setTimeout(() => {
+                                const input = document.querySelector(`input[data-produto-id="${produto._id}"]`);
+                                if (input) {
+                                  input.focus();
+                                  input.select();
+                                }
+                              }, 100);
+                            }}
                           >
                             +
                           </button>

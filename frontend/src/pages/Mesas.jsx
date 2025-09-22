@@ -304,6 +304,13 @@ const Mesas = () => {
       if (response.ok) {
         const vendaAtualizada = await response.json();
         setVendaAtual(vendaAtualizada);
+        
+        // Atualizar mesaProdutos se o modal estiver aberto para esta mesa
+        if (modalProdutosMesa && mesaProdutos && mesaProdutos._id === mesaSelecionada) {
+          setMesaProdutos({...mesaProdutos, vendaAtual: vendaAtualizada});
+          setModalUpdateKey(prev => prev + 1);
+        }
+        
         setSucesso(`${produto.nome} adicionado à venda`);
         setTimeout(() => setSucesso(''), 3000);
       } else {
@@ -334,6 +341,13 @@ const Mesas = () => {
       if (response.ok) {
         const vendaAtualizada = await response.json();
         setVendaAtual(vendaAtualizada);
+        
+        // Atualizar mesaProdutos se o modal estiver aberto para esta mesa
+        if (modalProdutosMesa && mesaProdutos && mesaProdutos._id === mesaSelecionada) {
+          setMesaProdutos({...mesaProdutos, vendaAtual: vendaAtualizada});
+          setModalUpdateKey(prev => prev + 1);
+        }
+        
         setSucesso(`${produto.nome} removido da venda`);
         setTimeout(() => setSucesso(''), 3000);
       } else {
@@ -413,10 +427,28 @@ const Mesas = () => {
                               <div className="mesa-acoes">
                                 <button
                                   className="btn-ver-produtos"
-                                  onClick={(e) => {
+                                  onClick={async (e) => {
                                     e.stopPropagation();
-                                    setMesaProdutos(mesa);
-                                    setModalProdutosMesa(true);
+                                    try {
+                                      // Buscar a venda atual da mesa
+                                      const response = await fetch(`http://localhost:4000/api/sale/list`);
+                                      const vendas = await response.json();
+                                      const vendaAtual = vendas.find(venda => 
+                                        venda.status === 'aberta' && venda.mesa === mesa._id
+                                      );
+                                      
+                                      if (vendaAtual) {
+                                        setMesaProdutos({...mesa, vendaAtual});
+                                        setModalProdutosMesa(true);
+                                      } else {
+                                        setErro('Nenhuma venda ativa encontrada para esta mesa');
+                                        setTimeout(() => setErro(''), 3000);
+                                      }
+                                    } catch (error) {
+                                      console.error('Erro ao buscar venda da mesa:', error);
+                                      setErro('Erro ao carregar dados da mesa');
+                                      setTimeout(() => setErro(''), 3000);
+                                    }
                                   }}
                                   title="Ver produtos"
                                 >
@@ -481,7 +513,7 @@ const Mesas = () => {
                     {vendaAtual.itens.map((item, index) => (
                       <div key={index} className="item-venda">
                         <div className="item-nome">{item.nomeProduto}</div>
-                        <div className="item-quantidade">Qtd: {item.quantidade}</div>
+                        <div className="item-quantidade">Qtd: <strong>{item.quantidade}</strong></div>
                         <div className="item-preco">R$ {item.subtotal?.toFixed(2)}</div>
                       </div>
                     ))}
@@ -733,25 +765,27 @@ const Mesas = () => {
       {modalProdutosMesa && mesaProdutos && (
         <div className="modal-overlay">
           <div className="modal-content modal-produtos" key={`modal-${mesaProdutos.vendaAtual?._id}-${modalUpdateKey}`}>
-            <div className="modal-header">
-              <h3>📋 Produtos da Mesa {mesaProdutos.numero}</h3>
-              <button 
-                className="modal-close"
-                onClick={() => setModalProdutosMesa(false)}
-              >
-                ✕
-              </button>
+            <div className="modal-header" style={{backgroundColor: '#27ae60', padding: '15px', borderRadius: '8px 8px 0 0'}}>
+              <div className="mesa-info-header">
+                <div>
+                  <h3 style={{color: 'white', margin: '0 0 10px 0'}}>📋 Produtos da Mesa {mesaProdutos.numero}</h3>
+                  {mesaProdutos.vendaAtual?.funcionario && (
+                    <p style={{color: 'white', margin: '0 0 5px 0', fontSize: '14px'}}>👨‍💼 Funcionário: {mesaProdutos.vendaAtual.funcionario?.nome?.toUpperCase() || mesaProdutos.vendaAtual.funcionario?.toUpperCase() || 'NÃO DEFINIDO'}</p>
+                  )}
+                  {mesaProdutos.vendaAtual?.observacoes && mesaProdutos.vendaAtual.observacoes.includes(' - ') && (
+                    <p style={{color: 'white', margin: '0 0 5px 0', fontSize: '14px'}}>👤 Responsável: {mesaProdutos.vendaAtual.observacoes.split(' - ')[1]?.trim().toUpperCase() || ''}</p>
+                  )}
+                  <p style={{color: 'white', margin: '0'}}>Total: R$ {mesaProdutos.vendaAtual?.total?.toFixed(2) || '0,00'}</p>
+                </div>
+                <button 
+                  className="modal-close"
+                  onClick={() => setModalProdutosMesa(false)}
+                >
+                  ✕ Fechar
+                </button>
+              </div>
             </div>
             <div className="modal-body">
-              <div className="produtos-mesa-info">
-                <p><strong>Funcionário:</strong> {mesaProdutos.vendaAtual?.funcionario?.nome || mesaProdutos.vendaAtual?.funcionario || 'Não definido'}</p>
-                <p><strong>Responsável:</strong> {mesaProdutos.vendaAtual?.observacoes?.includes('Responsavel:') ? (
-                  mesaProdutos.vendaAtual.observacoes.includes(' - ') 
-                    ? mesaProdutos.vendaAtual.observacoes.split('Responsavel:')[1].split(' - ')[0].trim()
-                    : mesaProdutos.vendaAtual.observacoes.split('Responsavel:')[1].trim()
-                ) : 'Não definido'}</p>
-              </div>
-              
               <div className="produtos-lista">
                 <h4>Produtos Adicionados ({mesaProdutos.vendaAtual?.itens?.length || 0})</h4>
                 {mesaProdutos.vendaAtual?.itens && mesaProdutos.vendaAtual.itens.length > 0 ? (
@@ -760,7 +794,7 @@ const Mesas = () => {
                       <div key={`${item.produto}-${index}-${item.quantidade}`} className="item-mesa-linha">
                         <div className="item-nome">{item.nomeProduto}</div>
                         <div className="item-preco">R$ {item.precoUnitario?.toFixed(2)}</div>
-                        <div className="item-quantidade">Qtd: {item.quantidade}</div>
+                        <div className="item-quantidade">Qtd: <strong>{item.quantidade}</strong></div>
                         <div className="item-subtotal">Subtotal: R$ {item.subtotal?.toFixed(2)}</div>
                         <div className="item-acoes">
                           <button 

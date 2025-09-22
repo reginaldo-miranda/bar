@@ -605,7 +605,8 @@
 }
 
 .item-quantidade {
-  color: #7f8c8d;
+  color: #2980b9;
+  font-weight: 600;
   margin: 0 8px;
 }
 
@@ -880,24 +881,27 @@
 }
 
 .modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
   cursor: pointer;
-  color: #7f8c8d;
-  padding: 0;
-  width: 30px;
-  height: 30px;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s ease;
+  min-width: 60px;
+  height: 28px;
 }
 
 .modal-close:hover {
-  background: #ecf0f1;
-  color: #2c3e50;
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
 }
 
 .modal-body {
@@ -1124,7 +1128,8 @@
 }
 
 .item-quantidade {
-  color: #7f8c8d;
+  color: #2980b9;
+  font-weight: 600;
   font-size: 14px;
   flex: 1;
   min-width: 80px;

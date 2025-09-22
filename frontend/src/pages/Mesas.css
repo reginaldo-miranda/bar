@@ -225,6 +225,9 @@
   color: #2c3e50;
   margin-bottom: 2px;
   line-height: 1.2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .mesa-nome-status {
@@ -327,27 +330,20 @@
   background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
   color: white;
   border: none;
-  padding: 4px 8px;
+  padding: 4px 6px;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  flex-shrink: 0;
-  margin-left: 8px;
-  align-self: flex-start;
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  z-index: 10;
-  max-width: 60px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  box-shadow: 0 1px 3px rgba(39, 174, 96, 0.3);
+  min-width: 30px;
+  height: 24px;
 }
 
 .btn-fechar-mesa:hover {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.4);
 }
 
 .sem-mesas {
@@ -1027,6 +1023,249 @@
   color: #212529;
 }
 
+/* Ações da Mesa */
+.mesa-acoes {
+  display: flex;
+  gap: 3px;
+  margin-top: 0;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.btn-ver-produtos {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(52, 152, 219, 0.3);
+  min-width: 30px;
+  height: 24px;
+}
+
+.btn-ver-produtos:hover {
+  background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
+}
+
+/* Modal de Produtos */
+.modal-produtos {
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.produtos-mesa-info {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #3498db;
+}
+
+.produtos-mesa-info p {
+  margin: 8px 0;
+  color: #495057;
+}
+
+.produtos-mesa-info strong {
+  color: #212529;
+}
+
+.produtos-lista h4 {
+  color: #2c3e50;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 8px;
+}
+
+.itens-mesa-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.item-mesa-linha {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  gap: 16px;
+}
+
+.item-mesa-linha:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.item-nome {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 16px;
+  flex: 2;
+  min-width: 150px;
+}
+
+.item-preco {
+  color: #27ae60;
+  font-weight: 600;
+  font-size: 14px;
+  flex: 1;
+  min-width: 80px;
+}
+
+.item-quantidade {
+  color: #7f8c8d;
+  font-size: 14px;
+  flex: 1;
+  min-width: 80px;
+}
+
+.item-subtotal {
+  color: #e74c3c;
+  font-weight: 600;
+  font-size: 14px;
+  flex: 1;
+  min-width: 100px;
+}
+
+.item-acoes {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-adicionar-item {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(46, 204, 113, 0.3);
+}
+
+.btn-adicionar-item:hover {
+  background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+  transform: translateY(-1px);
+}
+
+.btn-remover-item {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+}
+
+.btn-remover-item:hover {
+  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+  transform: translateY(-1px);
+}
+
+.sem-produtos {
+  text-align: center;
+  padding: 40px 20px;
+  color: #7f8c8d;
+}
+
+.sem-produtos p {
+  margin: 8px 0;
+}
+
+.total-mesa {
+  background: #2c3e50;
+  color: white;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.total-mesa h4 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.btn-adicionar-produtos {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+
+.btn-adicionar-produtos:hover {
+  background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+  transform: translateY(-1px);
+}
+
+/* Botões de ação nos itens do modal */
+.item-acoes {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.btn-adicionar-item,
+.btn-remover-item {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  min-width: 40px;
+}
+
+.btn-adicionar-item {
+  background-color: #27ae60;
+  color: white;
+}
+
+.btn-adicionar-item:hover:not(:disabled) {
+  background-color: #219a52;
+  transform: translateY(-1px);
+}
+
+.btn-remover-item {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-remover-item:hover:not(:disabled) {
+  background-color: #c0392b;
+  transform: translateY(-1px);
+}
+
+.btn-adicionar-item:disabled,
+.btn-remover-item:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
   .mesas-layout {
@@ -1034,11 +1273,29 @@
     grid-template-rows: 1fr 1fr;
   }
   
-  /* Estilo duplicado removido */
-  
   .modal-content {
     width: 95%;
     margin: 5px;
     max-height: 80vh;
+  }
+  
+  .itens-mesa-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .mesa-acoes {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .item-acoes {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .btn-adicionar-item,
+  .btn-remover-item {
+    padding: 10px;
+    font-size: 16px;
   }
 }

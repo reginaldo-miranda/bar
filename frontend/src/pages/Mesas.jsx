@@ -26,6 +26,9 @@ const Mesas = () => {
   const [funcionarios, setFuncionarios] = useState([]);
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState('');
   const [responsavelSelecionado, setResponsavelSelecionado] = useState('');
+  const [modalProdutosMesa, setModalProdutosMesa] = useState(false);
+  const [mesaProdutos, setMesaProdutos] = useState(null);
+  const [modalUpdateKey, setModalUpdateKey] = useState(0);
   const [observacoes, setObservacoes] = useState('');
   const [mesaParaAbrir, setMesaParaAbrir] = useState(null);
 
@@ -287,8 +290,6 @@ const Mesas = () => {
       
       const novoItem = {
         produtoId: produto._id,
-        nome: produto.nome,
-        preco: produto.precoVenda,
         quantidade: 1
       };
 
@@ -406,7 +407,36 @@ const Mesas = () => {
                           className="mesa-detalhes"
                           onClick={() => mesaOcupada ? abrirMesa(mesa) : confirmarAbrirMesa(mesa)}
                         >
-                          <div className="mesa-numero">Mesa: {mesa.numero}</div>
+                          <div className="mesa-numero">
+                            <span>Mesa: {mesa.numero}</span>
+                            {mesaOcupada && (
+                              <div className="mesa-acoes">
+                                <button
+                                  className="btn-ver-produtos"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setMesaProdutos(mesa);
+                                    setModalProdutosMesa(true);
+                                  }}
+                                  title="Ver produtos"
+                                >
+                                  📋
+                                </button>
+                                {mesaSelecionadaAtual && (
+                                  <button
+                                    className="btn-fechar-mesa"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      fecharMesa(mesa);
+                                    }}
+                                    title="Fechar mesa"
+                                  >
+                                    ✅
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
                           {mesaOcupada ? (
                             <>
                               <div className="mesa-funcionario">Func: {mesa.vendaAtual && mesa.vendaAtual.funcionario ? (mesa.vendaAtual.funcionario.nome || mesa.vendaAtual.funcionario) : 'Não definido'}</div>
@@ -425,18 +455,7 @@ const Mesas = () => {
                             </div>
                           )}
                         </div>
-                        {mesaSelecionadaAtual && mesaOcupada && (
-                          <button
-                            className="btn-fechar-mesa"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              fecharMesa(mesa);
-                            }}
-                            title="Fechar mesa"
-                          >
-                            ✅
-                          </button>
-                        )}
+
                       </div>
                     </div>
                   );
@@ -461,9 +480,9 @@ const Mesas = () => {
                   <div className="itens-grid">
                     {vendaAtual.itens.map((item, index) => (
                       <div key={index} className="item-venda">
-                        <div className="item-nome">{item.nome}</div>
+                        <div className="item-nome">{item.nomeProduto}</div>
                         <div className="item-quantidade">Qtd: {item.quantidade}</div>
-                        <div className="item-preco">R$ {(item.preco * item.quantidade).toFixed(2)}</div>
+                        <div className="item-preco">R$ {item.subtotal?.toFixed(2)}</div>
                       </div>
                     ))}
                   </div>
@@ -704,6 +723,176 @@ const Mesas = () => {
                 disabled={loading}
               >
                 {loading ? 'Abrindo...' : '🍽️ Abrir Mesa'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Produtos da Mesa */}
+      {modalProdutosMesa && mesaProdutos && (
+        <div className="modal-overlay">
+          <div className="modal-content modal-produtos" key={`modal-${mesaProdutos.vendaAtual?._id}-${modalUpdateKey}`}>
+            <div className="modal-header">
+              <h3>📋 Produtos da Mesa {mesaProdutos.numero}</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setModalProdutosMesa(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="produtos-mesa-info">
+                <p><strong>Funcionário:</strong> {mesaProdutos.vendaAtual?.funcionario?.nome || mesaProdutos.vendaAtual?.funcionario || 'Não definido'}</p>
+                <p><strong>Responsável:</strong> {mesaProdutos.vendaAtual?.observacoes?.includes('Responsavel:') ? (
+                  mesaProdutos.vendaAtual.observacoes.includes(' - ') 
+                    ? mesaProdutos.vendaAtual.observacoes.split('Responsavel:')[1].split(' - ')[0].trim()
+                    : mesaProdutos.vendaAtual.observacoes.split('Responsavel:')[1].trim()
+                ) : 'Não definido'}</p>
+              </div>
+              
+              <div className="produtos-lista">
+                <h4>Produtos Adicionados ({mesaProdutos.vendaAtual?.itens?.length || 0})</h4>
+                {mesaProdutos.vendaAtual?.itens && mesaProdutos.vendaAtual.itens.length > 0 ? (
+                  <div className="itens-mesa-lista">
+                    {mesaProdutos.vendaAtual.itens.map((item, index) => (
+                      <div key={`${item.produto}-${index}-${item.quantidade}`} className="item-mesa-linha">
+                        <div className="item-nome">{item.nomeProduto}</div>
+                        <div className="item-preco">R$ {item.precoUnitario?.toFixed(2)}</div>
+                        <div className="item-quantidade">Qtd: {item.quantidade}</div>
+                        <div className="item-subtotal">Subtotal: R$ {item.subtotal?.toFixed(2)}</div>
+                        <div className="item-acoes">
+                          <button 
+                            className="btn-adicionar-item"
+                            onClick={async () => {
+                              try {
+                                setLoading(true);
+                                
+                                const novoItem = {
+                                  produtoId: item.produto,
+                                  quantidade: 1
+                                };
+                        
+                                const response = await fetch(`http://localhost:4000/api/sale/${mesaProdutos.vendaAtual._id}/item`, {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json'
+                                  },
+                                  body: JSON.stringify(novoItem)
+                                });
+                        
+                                if (response.ok) {
+                                   // Atualizar os dados da mesa no modal
+                                   const responseList = await fetch(`http://localhost:4000/api/sale/list`);
+                                   const vendas = await responseList.json();
+                                   const vendaAtualizada = vendas.find(v => v._id === mesaProdutos.vendaAtual._id);
+                                   setMesaProdutos({...mesaProdutos, vendaAtual: vendaAtualizada});
+                                   // Atualizar vendaAtual se for a mesa selecionada
+                                   if (mesaSelecionada === mesaProdutos._id) {
+                                     setVendaAtual(vendaAtualizada);
+                                   }
+                                   // Forçar re-renderização do modal
+                                   setModalUpdateKey(prev => prev + 1);
+                                   // Atualizar as mesas na tela principal
+                                   carregarMesas();
+                                   setSucesso(`${item.nomeProduto} adicionado à venda`);
+                                   setTimeout(() => setSucesso(''), 3000);
+                                } else {
+                                  const errorData = await response.json();
+                                  setErro(errorData.error || 'Erro ao adicionar item');
+                                  setTimeout(() => setErro(''), 3000);
+                                }
+                              } catch (error) {
+                                console.error('Erro ao adicionar item:', error);
+                                setErro('Erro ao adicionar item à venda');
+                                setTimeout(() => setErro(''), 3000);
+                              } finally {
+                                setLoading(false);
+                              }
+                            }}
+                            title="Adicionar mais uma unidade"
+                            disabled={loading}
+                          >
+                            ➕
+                          </button>
+                          <button 
+                            className="btn-remover-item"
+                            onClick={async () => {
+                              try {
+                                setLoading(true);
+                                
+                                const response = await fetch(`http://localhost:4000/api/sale/${mesaProdutos.vendaAtual._id}/item/${item.produto}`, {
+                                  method: 'DELETE'
+                                });
+                        
+                                if (response.ok) {
+                                   // Atualizar os dados da mesa no modal
+                                   const responseList = await fetch(`http://localhost:4000/api/sale/list`);
+                                   const vendas = await responseList.json();
+                                   const vendaAtualizada = vendas.find(v => v._id === mesaProdutos.vendaAtual._id);
+                                   setMesaProdutos({...mesaProdutos, vendaAtual: vendaAtualizada});
+                                   // Atualizar vendaAtual se for a mesa selecionada
+                                   if (mesaSelecionada === mesaProdutos._id) {
+                                     setVendaAtual(vendaAtualizada);
+                                   }
+                                   // Forçar re-renderização do modal
+                                   setModalUpdateKey(prev => prev + 1);
+                                   // Atualizar as mesas na tela principal
+                                   carregarMesas();
+                                   setSucesso(`${item.nomeProduto} removido da venda`);
+                                   setTimeout(() => setSucesso(''), 3000);
+                                } else {
+                                  const errorData = await response.json();
+                                  setErro(errorData.error || 'Erro ao remover item');
+                                  setTimeout(() => setErro(''), 3000);
+                                }
+                              } catch (error) {
+                                console.error('Erro ao remover item:', error);
+                                setErro('Erro ao remover item da venda');
+                                setTimeout(() => setErro(''), 3000);
+                              } finally {
+                                setLoading(false);
+                              }
+                            }}
+                            title="Remover uma unidade"
+                            disabled={loading}
+                          >
+                            ➖
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="sem-produtos">
+                    <p>🍽️ Nenhum produto adicionado ainda</p>
+                    <p>Adicione produtos para começar a venda</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="total-mesa">
+                <h4>Total: R$ {mesaProdutos.vendaAtual?.total?.toFixed(2) || '0.00'}</h4>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn-cancelar"
+                onClick={() => setModalProdutosMesa(false)}
+              >
+                Fechar
+              </button>
+              <button 
+                className="btn-adicionar-produtos"
+                onClick={() => {
+                  // Selecionar a mesa e fechar o modal para adicionar produtos
+                  setMesaSelecionada(mesaProdutos._id);
+                  setVendaAtual(mesaProdutos.vendaAtual);
+                  setModalProdutosMesa(false);
+                }}
+              >
+                ➕ Adicionar Produtos
               </button>
             </div>
           </div>

@@ -25,11 +25,22 @@ const Mesas = () => {
   });
   const [funcionarios, setFuncionarios] = useState([]);
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState('');
+  const [responsavelSelecionado, setResponsavelSelecionado] = useState('');
   const [observacoes, setObservacoes] = useState('');
   const [mesaParaAbrir, setMesaParaAbrir] = useState(null);
 
   useEffect(() => {
-    carregarMesas();
+    carregarDados();
+  }, []);
+
+  // Recarregar dados quando a página volta a ser focada (retorno do caixa)
+  useEffect(() => {
+    const handleFocus = () => {
+      carregarDados();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
   const carregarDados = async () => {
@@ -57,14 +68,18 @@ const Mesas = () => {
         
         return {
           ...mesa,
-          vendaAtual: vendaAberta || mesa.vendaAtual,
-          status: vendaAberta ? 'ocupada' : mesa.status
+          vendaAtual: vendaAberta || null,
+          status: vendaAberta ? 'ocupada' : 'livre'
         };
       });
+      
+      console.log('Mesas carregadas:', mesasComVendas);
+      console.log('Vendas abertas:', vendasData.filter(v => v.status === 'aberta'));
       
       setMesas(mesasComVendas);
     } catch (error) {
       console.error('Erro ao carregar mesas:', error);
+      setErro('Erro ao carregar mesas. Verifique se o servidor está rodando.');
     }
   };
 
@@ -98,8 +113,8 @@ const Mesas = () => {
       }));
       
       setCategorias([{ id: 'todas', nome: 'Todas', icon: '🍽️' }, ...categoriasComIcones]);
-    } catch (error) {
-      console.error('Erro ao carregar produtos:', error);
+    } catch {
+      console.error('Erro ao carregar produtos');
     }
   };
 
@@ -127,13 +142,16 @@ const Mesas = () => {
         setModalNovaMesa(false);
         setNovaMesa({ numero: '', nome: '', capacidade: 4, tipo: 'interna', observacoes: '' });
         setSucesso('Mesa criada com sucesso!');
-        carregarMesas();
+        // Aguardar um pouco antes de recarregar para garantir que o servidor processou
+        setTimeout(() => {
+          carregarMesas();
+        }, 500);
         setTimeout(() => setSucesso(''), 3000);
       } else {
         const errorData = await response.json();
         setErro(errorData.message || 'Erro ao criar mesa');
       }
-    } catch (error) {
+    } catch {
       setErro('Erro ao conectar com o servidor');
     } finally {
       setLoading(false);
@@ -165,7 +183,7 @@ const Mesas = () => {
         const funcionariosData = await funcResponse.json();
         setFuncionarios(funcionariosData);
       }
-    } catch (error) {
+    } catch {
       setErro('Erro ao abrir mesa');
     }
   };
@@ -179,7 +197,7 @@ const Mesas = () => {
       const funcResponse = await fetch('http://localhost:4000/api/employee/list');
       const funcionariosData = await funcResponse.json();
       setFuncionarios(funcionariosData);
-    } catch (error) {
+    } catch {
       setErro('Erro ao carregar funcionários');
     }
   };
@@ -196,7 +214,7 @@ const Mesas = () => {
       const dadosVenda = {
         mesa: mesaParaAbrir._id,
         funcionario: funcionarioSelecionado,
-        observacoes: observacoes ? `Responsavel: ${funcionarios.find(f => f._id === funcionarioSelecionado)?.nome || ''} - ${observacoes}` : `Responsavel: ${funcionarios.find(f => f._id === funcionarioSelecionado)?.nome || ''}`,
+        observacoes: observacoes ? `Responsavel: ${responsavelSelecionado || funcionarios.find(f => f._id === funcionarioSelecionado)?.nome || ''} - ${observacoes}` : `Responsavel: ${responsavelSelecionado || funcionarios.find(f => f._id === funcionarioSelecionado)?.nome || ''}`,
         status: 'aberta',
         itens: [],
         subtotal: 0,
@@ -217,44 +235,118 @@ const Mesas = () => {
         setVendaAtual(vendaCriada);
         setModalAbrirMesa(false);
         setFuncionarioSelecionado('');
+        setResponsavelSelecionado('');
         setObservacoes('');
         setSucesso('Mesa aberta com sucesso!');
         setTimeout(() => setSucesso(''), 2000);
+        // Recarregar mesas para atualizar o status
+        setTimeout(() => {
+          carregarMesas();
+        }, 500);
         carregarProdutos();
       } else {
         const errorData = await response.json();
         setErro(errorData.message || 'Erro ao abrir mesa');
       }
-    } catch (error) {
+    } catch {
       setErro('Erro ao conectar com o servidor');
     } finally {
       setLoading(false);
     }
   };
 
-  const fecharMesa = async (mesaId) => {
+  const fecharMesa = (mesa) => {
+    if (!vendaAtual) {
+      setErro('Nenhuma venda ativa para fechar');
+      return;
+    }
+
+    if (!vendaAtual.itens || vendaAtual.itens.length === 0) {
+      setErro('Adicione pelo menos um item antes de fechar a mesa');
+      return;
+    }
+
+    // Navegar para o caixa com os dados da mesa, igual às comandas
+    navigate('/caixa', { 
+      state: { 
+        comanda: vendaAtual, 
+        origem: '/mesas',
+        mesa: mesa 
+      } 
+    });
+  };
+
+  const adicionarItem = async (produto) => {
+    if (!vendaAtual || !mesaSelecionada) {
+      setErro('Selecione uma mesa primeiro');
+      return;
+    }
+
     try {
-      const response = await fetch(`http://localhost:4000/api/sale/${vendaAtual._id}/close`, {
-        method: 'PUT',
+      setLoading(true);
+      
+      const novoItem = {
+        produtoId: produto._id,
+        nome: produto.nome,
+        preco: produto.precoVenda,
+        quantidade: 1
+      };
+
+      const response = await fetch(`http://localhost:4000/api/sale/${vendaAtual._id}/item`, {
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ status: 'fechada' })
+        body: JSON.stringify(novoItem)
       });
 
       if (response.ok) {
-        setMesaSelecionada(null);
-        setVendaAtual(null);
-        carregarMesas();
+        const vendaAtualizada = await response.json();
+        setVendaAtual(vendaAtualizada);
+        setSucesso(`${produto.nome} adicionado à venda`);
         setTimeout(() => setSucesso(''), 3000);
+      } else {
+        throw new Error('Erro ao adicionar item');
       }
     } catch (error) {
-      setErro('Erro ao fechar mesa');
-    }
-  };
+      console.error('Erro ao adicionar item:', error);
+      setErro('Erro ao adicionar item à venda');
+      setTimeout(() => setErro(''), 3000);
+    } finally {
+       setLoading(false);
+     }
+    };
 
-  const adicionarItem = (produto) => {
-    // Implementar lógica de adicionar item
+  const removerItem = async (produto) => {
+    if (!vendaAtual) {
+      setErro('Nenhuma venda ativa');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const response = await fetch(`http://localhost:4000/api/sale/${vendaAtual._id}/item/${produto._id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        const vendaAtualizada = await response.json();
+        setVendaAtual(vendaAtualizada);
+        setSucesso(`${produto.nome} removido da venda`);
+        setTimeout(() => setSucesso(''), 3000);
+      } else {
+        const errorData = await response.json();
+        setErro(errorData.error || 'Erro ao remover item');
+        setTimeout(() => setErro(''), 3000);
+      }
+    } catch (error) {
+      console.error('Erro ao remover item:', error);
+      setErro('Erro ao remover item da venda');
+      setTimeout(() => setErro(''), 3000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const produtosFiltrados = produtos.filter(produto => {
@@ -275,7 +367,7 @@ const Mesas = () => {
             ➕ Nova Mesa
           </button>
           <button 
-            className="btn-voltar"
+            className="btn-voltar-pdv"
             onClick={() => navigate('/pdv')}
           >
             ← Voltar ao PDV
@@ -287,6 +379,7 @@ const Mesas = () => {
       {sucesso && <div className="sucesso-msg">{sucesso}</div>}
 
       <div className="mesas-layout">
+        {/* Painel Esquerdo - Mesas e Itens Selecionados */}
         <div className="mesas-lista">
           <div className="mesas-section">
             <h3>Todas as Mesas ({mesas.length})</h3>
@@ -301,14 +394,7 @@ const Mesas = () => {
                     (mesa.vendaAtual && mesa.vendaAtual.status === 'aberta') ||
                     (mesa.vendaAtual && mesa.vendaAtual.observacoes && mesa.vendaAtual.observacoes.includes('Responsavel:'));
                   
-                  // Extrair nome do responsável
-                  let nomeResponsavel = null;
-                  if (mesa.vendaAtual && mesa.vendaAtual.observacoes) {
-                    const observacoes = mesa.vendaAtual.observacoes;
-                    if (observacoes.includes('Responsavel:')) {
-                      nomeResponsavel = observacoes.replace('Responsavel:', '').replace('Responsavel: ', '').trim();
-                    }
-                  }
+
                   
                   return (
                     <div 
@@ -320,20 +406,23 @@ const Mesas = () => {
                           className="mesa-detalhes"
                           onClick={() => mesaOcupada ? abrirMesa(mesa) : confirmarAbrirMesa(mesa)}
                         >
-                          <div className="mesa-numero">Mesa {mesa.numero}</div>
-                          <div className="mesa-nome">{mesa.nome}</div>
-                          <div className="mesa-tipo">{mesa.tipo}</div>
-                          <div className="mesa-capacidade">👥 {mesa.capacidade}</div>
-                          <div className={`mesa-status-badge ${mesaOcupada ? 'ocupada' : 'livre'}`}>
-                            {mesaOcupada ? '🔴 OCUPADA' : '🟢 LIVRE'}
-                          </div>
-                          {mesaOcupada && nomeResponsavel && (
-                             <div className="mesa-responsavel">
-                               👤 RESPONSAVEL: {nomeResponsavel.toUpperCase()}
-                             </div>
-                           )}
-                          {mesa.observacoes && (
-                            <div className="mesa-observacoes">{mesa.observacoes}</div>
+                          <div className="mesa-numero">Mesa: {mesa.numero}</div>
+                          {mesaOcupada ? (
+                            <>
+                              <div className="mesa-funcionario">Func: {mesa.vendaAtual && mesa.vendaAtual.funcionario ? (mesa.vendaAtual.funcionario.nome || mesa.vendaAtual.funcionario) : 'Não definido'}</div>
+                              <div className="mesa-responsavel">Resp: {mesa.vendaAtual && mesa.vendaAtual.observacoes && mesa.vendaAtual.observacoes.includes('Responsavel:') ? (
+                                mesa.vendaAtual.observacoes.includes(' - ') 
+                                  ? mesa.vendaAtual.observacoes.split('Responsavel:')[1].split(' - ')[0].trim()
+                                  : mesa.vendaAtual.observacoes.split('Responsavel:')[1].trim()
+                              ) : 'Não definido'}</div>
+                              <div className={`mesa-status-badge ocupada`}>
+                                Status: OCUPADA
+                              </div>
+                            </>
+                          ) : (
+                            <div className={`mesa-status-badge livre`}>
+                              Status: LIVRE
+                            </div>
                           )}
                         </div>
                         {mesaSelecionadaAtual && mesaOcupada && (
@@ -341,7 +430,7 @@ const Mesas = () => {
                             className="btn-fechar-mesa"
                             onClick={(e) => {
                               e.stopPropagation();
-                              fecharMesa(mesa._id);
+                              fecharMesa(mesa);
                             }}
                             title="Fechar mesa"
                           >
@@ -362,66 +451,112 @@ const Mesas = () => {
               )}
             </div>
           </div>
+
+          {/* Área de Itens Selecionados */}
+          {vendaAtual && (
+            <div className="itens-selecionados">
+              <div className="itens-lista">
+                <h4>Itens da Venda</h4>
+                {vendaAtual.itens && vendaAtual.itens.length > 0 ? (
+                  <div className="itens-grid">
+                    {vendaAtual.itens.map((item, index) => (
+                      <div key={index} className="item-venda">
+                        <div className="item-nome">{item.nome}</div>
+                        <div className="item-quantidade">Qtd: {item.quantidade}</div>
+                        <div className="item-preco">R$ {(item.preco * item.quantidade).toFixed(2)}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="sem-itens">
+                    <p>Nenhum item adicionado</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
+        {/* Painel Direito - Produtos */}
         <div className="produtos-area">
-          {vendaAtual ? (
-            <>
-              <div className="mesa-selecionada">
-                <div className="mesa-info-header">
+          {/* Área de Finalização */}
+          {vendaAtual && (
+            <div className="mesa-finalizacao" style={{backgroundColor: '#27ae60', padding: '15px', borderRadius: '8px'}}>
+              <div className="mesa-info-header">
                   <div>
-                    <h3>Mesa: {mesas.find(m => m._id === mesaSelecionada)?.numero} - {mesas.find(m => m._id === mesaSelecionada)?.nome}</h3>
-                    <p>Total: R$ {vendaAtual.total?.toFixed(2) || '0,00'}</p>
+                    <h3 style={{color: 'white', margin: '0 0 10px 0'}}>Mesa: {mesas.find(m => m._id === mesaSelecionada)?.numero} - {mesas.find(m => m._id === mesaSelecionada)?.nome}</h3>
+                    {vendaAtual.observacoes && vendaAtual.observacoes.includes(' - ') && (
+                      <p style={{color: 'white', margin: '0 0 5px 0', fontSize: '14px'}}>👤 Responsável: {vendaAtual.observacoes.split(' - ')[1]?.trim().toUpperCase() || ''}</p>
+                    )}
+                    {vendaAtual.funcionario && (
+                      <p style={{color: 'white', margin: '0 0 5px 0', fontSize: '14px'}}>👨‍💼 Funcionário: {funcionarios.find(f => f._id === vendaAtual.funcionario)?.nome?.toUpperCase() || vendaAtual.funcionario?.nome?.toUpperCase() || 'NÃO DEFINIDO'}</p>
+                    )}
+                    <p style={{color: 'white', margin: '0'}}>Total: R$ {vendaAtual.total?.toFixed(2) || '0,00'}</p>
                   </div>
-                  <button
-                    className="btn-fechar-mesa-fixo"
-                    onClick={() => fecharMesa(mesaSelecionada)}
-                    title="Fechar mesa"
+                <button
+                  className="btn-fechar-mesa-fixo"
+                  onClick={() => fecharMesa(mesaSelecionada)}
+                  title="Fechar mesa"
+                >
+                  ✅ Fechar Mesa
+                </button>
+              </div>
+            </div>
+          )}
+          
+          <div className="produtos-filtros">
+            <div className="categorias-chips">
+              {categorias.map(categoria => (
+                <button
+                  key={categoria.id}
+                  className={`categoria-chip ${categoriaSelecionada === categoria.id ? 'ativo' : ''}`}
+                  onClick={() => setCategoriaSelecionada(categoria.id)}
+                >
+                  {categoria.icon} {categoria.nome}
+                </button>
+              ))}
+            </div>
+
+            <div className="busca-produto">
+              <input
+                type="text"
+                placeholder="🔍 Buscar produto..."
+                value={buscarProduto}
+                onChange={(e) => setBuscarProduto(e.target.value)}
+                className="input-busca"
+              />
+            </div>
+          </div>
+
+          <div className="produtos-grid">
+            {produtosFiltrados.map(produto => (
+              <div 
+                key={produto._id} 
+                className="produto-card"
+              >
+                <div className="produto-nome">{produto.nome}</div>
+                <div className="produto-preco">R$ {produto.precoVenda?.toFixed(2)}</div>
+                <div className="produto-botoes">
+                  <button 
+                    className="btn-remover-produto"
+                    onClick={() => removerItem(produto)}
+                    disabled={!vendaAtual}
                   >
-                    ✅ Fechar Mesa
+                    -
+                  </button>
+                  <button 
+                    className="btn-adicionar-produto"
+                    onClick={() => adicionarItem(produto)}
+                    disabled={!vendaAtual}
+                  >
+                    +
                   </button>
                 </div>
               </div>
+            ))}
+          </div>
 
-              <div className="produtos-filtros">
-                <div className="categorias-chips">
-                  {categorias.map(categoria => (
-                    <button
-                      key={categoria.id}
-                      className={`categoria-chip ${categoriaSelecionada === categoria.id ? 'ativo' : ''}`}
-                      onClick={() => setCategoriaSelecionada(categoria.id)}
-                    >
-                      {categoria.icon} {categoria.nome}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="busca-produto">
-                  <input
-                    type="text"
-                    placeholder="🔍 Buscar produto..."
-                    value={buscarProduto}
-                    onChange={(e) => setBuscarProduto(e.target.value)}
-                    className="input-busca"
-                  />
-                </div>
-              </div>
-
-              <div className="produtos-grid">
-                {produtosFiltrados.map(produto => (
-                  <div 
-                    key={produto._id} 
-                    className="produto-card"
-                    onClick={() => adicionarItem(produto)}
-                  >
-                    <div className="produto-nome">{produto.nome}</div>
-                    <div className="produto-preco">R$ {produto.precoVenda?.toFixed(2)}</div>
-                    <div className="produto-grupo">{produto.grupo}</div>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
+          {!vendaAtual && (
             <div className="selecione-mesa">
               <h3>Selecione uma mesa para adicionar produtos</h3>
               <p>Clique em uma mesa da lista ao lado para começar</p>
@@ -537,6 +672,15 @@ const Mesas = () => {
                     </option>
                   ))}
                 </select>
+              </div>
+              <div className="form-group">
+                <label>Nome do Responsável (opcional):</label>
+                <input
+                  type="text"
+                  value={responsavelSelecionado}
+                  onChange={(e) => setResponsavelSelecionado(e.target.value)}
+                  placeholder="Digite o nome do responsável..."
+                />
               </div>
               <div className="form-group">
                 <label>Observações:</label>

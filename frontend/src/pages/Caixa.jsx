@@ -65,6 +65,14 @@ const Caixa = () => {
 
       if (response.ok) {
         setSucesso('Venda finalizada com sucesso!');
+        
+        // Se veio das mesas, limpar dados da mesa no estado local
+        if (origem === '/mesas') {
+          // Limpar dados da mesa no localStorage se necessário
+          localStorage.removeItem('mesaSelecionada');
+          localStorage.removeItem('vendaAtual');
+        }
+        
         setTimeout(() => {
           navigate(origem || '/comandas');
         }, 2000);

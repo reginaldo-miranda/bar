@@ -334,6 +334,18 @@ router.put('/:id/finalize', async (req, res) => {
     venda.dataFinalizacao = new Date();
     await venda.save();
     
+    // Se a venda está associada a uma mesa, limpar os dados da mesa
+    if (venda.mesa) {
+      const Mesa = (await import('../models/Mesa.js')).default;
+      await Mesa.findByIdAndUpdate(venda.mesa, {
+        status: 'livre',
+        vendaAtual: null,
+        clientesAtuais: 0,
+        horaAbertura: null,
+        observacoes: ''
+      });
+    }
+    
     const vendaFinalizada = await Sale.findById(venda._id)
       .populate('funcionario', 'nome')
       .populate('cliente', 'nome')

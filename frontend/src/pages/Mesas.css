@@ -10,6 +10,7 @@
   flex-direction: column;
   overflow: hidden;
   box-sizing: border-box;
+  position: relative;
 }
 
 /* Header */
@@ -70,6 +71,23 @@
   box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
 }
 
+.btn-voltar {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn-voltar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
 /* Messages */
 .erro-msg {
   background: #e74c3c;
@@ -93,44 +111,56 @@
 
 /* Layout */
 .mesas-layout {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 10px;
+  display: flex;
+  gap: 15px;
   flex: 1;
-  min-height: 0;
+  overflow: hidden;
 }
 
 /* Lista de Mesas */
 .mesas-lista {
+  flex: 0 0 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+}
+
+.mesas-section {
   background: white;
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  flex-shrink: 0;
 }
 
-.mesas-lista h3 {
+.mesas-section h3 {
   margin: 0 0 15px 0;
   color: #2c3e50;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 .mesas-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 6px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .mesa-card {
   border: 2px solid #ecf0f1;
-  border-radius: 12px;
+  border-radius: 6px;
   overflow: hidden;
   transition: all 0.3s ease;
   cursor: pointer;
   background: white;
+  min-height: 120px;
+  max-height: 140px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   position: relative;
   isolation: isolate;
   contain: layout style;
@@ -166,61 +196,78 @@
 }
 
 .mesa-info {
-  padding: 10px 20px 10px 12px;
+  padding: 12px 20px 12px 12px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   background: transparent;
-  min-height: 65px;
-  position: relative;
-  z-index: 1;
+  min-height: 120px;
   width: 100%;
   box-sizing: border-box;
 }
 
 .mesa-detalhes {
+  padding: 0;
   flex: 1;
   cursor: pointer;
   min-width: 0;
   overflow: hidden;
-  max-width: calc(100% - 80px);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: flex-start;
+  padding-top: 2px;
 }
 
 .mesa-numero {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #2c3e50;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   line-height: 1.2;
 }
 
+.mesa-nome-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  width: 100%;
+  overflow: visible;
+}
+
 .mesa-nome {
-  font-size: 0.8rem;
-  color: #34495e;
-  margin-bottom: 3px;
+  font-size: 0.75rem;
   font-weight: 500;
+  color: #34495e;
+  margin-bottom: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
 .mesa-tipo {
-  font-size: 0.75rem;
-  color: #7f8c8d;
-  margin-bottom: 3px;
-  text-transform: capitalize;
+  display: none;
 }
 
 .mesa-capacidade {
-  font-size: 0.75rem;
-  color: #7f8c8d;
-  margin-bottom: 3px;
+  display: none;
 }
 
 .mesa-status-badge {
-  font-size: 0.7rem;
-  padding: 2px 6px;
-  border-radius: 10px;
+  font-size: 0.65rem;
+  padding: 2px 4px;
+  border-radius: 8px;
   font-weight: 600;
   text-align: center;
-  margin-bottom: 2px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: fit-content;
+  display: block;
 }
 
 .mesa-status-badge.livre {
@@ -244,12 +291,20 @@
   font-weight: 700;
 }
 
+.mesa-funcionario {
+  font-size: 0.75rem;
+  color: #2c3e50;
+  margin-bottom: 2px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 .mesa-responsavel {
   font-size: 0.8rem;
   color: #ffffff;
   font-weight: 700;
   margin-bottom: 4px;
-  padding: 6px 10px;
+  padding: 3px 6px;
   background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   border-radius: 8px;
   border: 2px solid #2980b9;
@@ -311,8 +366,268 @@
   font-style: italic;
 }
 
+/* Filtros de Produtos */
+.produtos-filtros {
+  margin-bottom: 15px;
+  flex-shrink: 0;
+}
+
+.categorias-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.categoria-chip {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  color: #495057;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.categoria-chip:hover {
+  background: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.categoria-chip.ativo {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+.busca-produto {
+  margin-bottom: 10px;
+}
+
+.input-busca {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.input-busca:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+/* Grid de Produtos - FORÇAR LAYOUT HORIZONTAL */
+.mesas-container .produtos-grid {
+  display: block !important;
+  width: 100% !important;
+  padding: 5px 10px 10px 10px !important;
+}
+
+/* Produto em linha completa - LAYOUT HORIZONTAL SIMPLES */
+.mesas-container .produto-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 8px 0 !important;
+  margin: 1px 0 !important;
+  cursor: pointer !important;
+  min-height: 40px !important;
+}
+
+.mesas-container .produto-nome {
+  flex: 1 !important;
+  font-weight: 500 !important;
+  color: #2c3e50 !important;
+  font-size: 1rem !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+  margin-right: 15px !important;
+}
+
+.mesas-container .produto-preco {
+  font-weight: 600 !important;
+  color: #27ae60 !important;
+  font-size: 1rem !important;
+  white-space: nowrap !important;
+  margin-right: 15px !important;
+  min-width: 80px !important;
+  text-align: center !important;
+}
+
+.mesas-container .produto-botoes {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+.mesas-container .btn-adicionar-produto {
+  background: #27ae60 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 8px 16px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 40px !important;
+}
+
+.mesas-container .btn-remover-produto {
+  background: #e74c3c !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 8px 16px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 40px !important;
+}
+
+.btn-adicionar-produto:hover {
+  background: #219a52;
+  transform: scale(1.05);
+}
+
+.btn-adicionar-produto:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-adicionar-produto:disabled:hover {
+  background: #bdc3c7;
+  transform: none;
+}
+
+/* Layout das Mesas */
+.mesas-layout {
+  display: flex;
+  gap: 15px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.mesas-lista {
+  flex: 0 0 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+}
+
+/* Área de Finalização */
+.mesa-finalizacao {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #27ae60;
+}
+
+.mesa-finalizacao .mesa-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mesa-finalizacao h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #2c3e50;
+}
+
+.mesa-finalizacao p {
+  margin: 4px 0 0 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+/* Área de Itens Selecionados */
+.itens-selecionados {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-height: 250px;
+  max-height: 350px;
+  margin-top: 16px;
+}
+
+.itens-lista {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 12px;
+  min-height: 200px;
+}
+
+.itens-lista h4 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 5px;
+}
+
+.itens-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-venda {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.item-nome {
+  font-weight: 600;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.item-quantidade {
+  color: #7f8c8d;
+  margin: 0 8px;
+}
+
+.item-preco {
+  font-weight: 700;
+  color: #27ae60;
+}
+
+.sem-itens {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 20px;
+  font-style: italic;
+}
+
 /* Área de Produtos */
 .produtos-area {
+  flex: 1;
   background: white;
   border-radius: 8px;
   padding: 12px;
@@ -468,32 +783,7 @@
   border-color: #3498db;
 }
 
-/* Grid de Produtos */
-.produtos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.produto-card {
-  background: white;
-  border: 2px solid #ecf0f1;
-  border-radius: 8px;
-  padding: 12px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.produto-card:hover {
-  border-color: #3498db;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
-}
+/* Estilos duplicados removidos - usando apenas os estilos da linha 402 */
 
 .produto-info {
   flex: 1;
@@ -744,9 +1034,7 @@
     grid-template-rows: 1fr 1fr;
   }
   
-  .produtos-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
+  /* Estilo duplicado removido */
   
   .modal-content {
     width: 95%;

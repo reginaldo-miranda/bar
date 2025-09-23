@@ -11,6 +11,8 @@ const Comandas = () => {
   const [vendaAtual, setVendaAtual] = useState(null);
   const [comandaSelecionada, setComandaSelecionada] = useState(null);
   const [modalNovaComanda, setModalNovaComanda] = useState(false);
+  const [modalProdutosComanda, setModalProdutosComanda] = useState(false);
+  const [comandaProdutos, setComandaProdutos] = useState(null);
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState('');
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
@@ -221,6 +223,44 @@ const Comandas = () => {
     }
   };
 
+  const removerItem = async (produto) => {
+    if (!vendaAtual) {
+      setErro('Selecione uma comanda primeiro');
+      return;
+    }
+
+    setLoading(true);
+    setErro('');
+    
+    try {
+      const response = await fetch(`http://localhost:4000/api/sale/${vendaAtual._id}/item`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          produtoId: produto._id,
+          quantidade: 1
+        })
+      });
+
+      if (response.ok) {
+        const vendaAtualizada = await response.json();
+        setVendaAtual(vendaAtualizada);
+        carregarComandas();
+        setSucesso(`${produto.nome} removido da comanda!`);
+        setTimeout(() => setSucesso(''), 2000);
+      } else {
+        const errorData = await response.json();
+        setErro(errorData.error || 'Erro ao remover item');
+      }
+    } catch {
+      setErro('Erro ao conectar com o servidor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const produtosFiltrados = produtos.filter(produto => {
     const matchCategoria = categoriaSelecionada === 'todos' || produto.grupo === categoriaSelecionada;
     const matchBusca = produto.nome.toLowerCase().includes(buscarProduto.toLowerCase());
@@ -240,7 +280,7 @@ const Comandas = () => {
           </button>
           <button 
             className="btn-voltar-pdv"
-            onClick={() => navigate('/pdv')}
+         onClick={() => navigate('/pdv')}
           >
             ← Voltar ao PDV
           </button>
@@ -281,23 +321,35 @@ const Comandas = () => {
                       >
                         <div className="comanda-funcionario">{funcionarioNome}</div>
                         <div className="comanda-nome">{nomeComanda}</div>
-                         <div className="comanda-cliente">{clienteNome}</div>
                         <div className="comanda-total">R$ {comanda.total?.toFixed(2) || '0,00'}</div>
                         <div className="comanda-itens">{comanda.itens?.length || 0} itens</div>
                         {comanda.observacoes && (
                           <div className="comanda-observacoes">{comanda.observacoes}</div>
                         )}
                       </div>
-                      <button
-                        className="btn-fechar-comanda"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          fecharComanda(comanda._id);
-                        }}
-                        title="Finalizar venda"
-                      >
-                        ✅
-                      </button>
+                      <div className="comanda-actions">
+                        <button
+                          className="btn-abrir-modal"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setComandaProdutos(comanda);
+                            setModalProdutosComanda(true);
+                          }}
+                          title="Ver Produtos"
+                        >
+                          📋
+                        </button>
+                        <button
+                          className="btn-fechar-comanda"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            fecharComanda(comanda._id);
+                          }}
+                          title="Finalizar venda"
+                        >
+                          ✅
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -370,20 +422,24 @@ const Comandas = () => {
               <div className="produtos-grid">
                 {produtosFiltrados.map(produto => (
                   <div key={produto._id} className="produto-card">
-                    <div className="produto-info">
-                      <h4>{produto.nome}</h4>
-                      <p className="produto-preco">R$ {produto.precoVenda?.toFixed(2)}</p>
-                      {produto.descricao && (
-                        <p className="produto-descricao">{produto.descricao}</p>
-                      )}
+                    <div className="produto-nome">{produto.nome}</div>
+                    <div className="produto-preco">R$ {produto.precoVenda?.toFixed(2)}</div>
+                    <div className="produto-botoes">
+                      <button 
+                        className="btn-remover-produto"
+                        onClick={() => removerItem(produto)}
+                        disabled={!vendaAtual}
+                      >
+                        -
+                      </button>
+                      <button
+                        className="btn-adicionar-produto"
+                        onClick={() => adicionarItem(produto)}
+                        disabled={!vendaAtual}
+                      >
+                        +
+                      </button>
                     </div>
-                    <button
-                      className="btn-adicionar"
-                      onClick={() => adicionarItem(produto)}
-                      disabled={loading}
-                    >
-                      ➕ Adicionar
-                    </button>
                   </div>
                 ))}
                 
@@ -490,6 +546,150 @@ const Comandas = () => {
                 disabled={loading}
               >
                 {loading ? 'Criando...' : 'Criar Comanda'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalProdutosComanda && comandaProdutos && (
+        <div className="modal-overlay">
+          <div className="modal-content modal-produtos">
+            <div className="modal-header" style={{backgroundColor: '#27ae60', padding: '15px', borderRadius: '8px 8px 0 0'}}>
+              <div className="mesa-info-header">
+                <div>
+                  <h3 style={{color: 'white', margin: '0 0 10px 0'}}>📋 Produtos da Comanda</h3>
+                  <p style={{color: 'white', margin: '0 0 5px 0', fontSize: '14px'}}>👨‍💼 Funcionário: {comandaProdutos.funcionario?.nome?.toUpperCase() || comandaProdutos.funcionario?.toUpperCase() || 'NÃO DEFINIDO'}</p>
+                  <p style={{color: 'white', margin: '0'}}>Total: R$ {comandaProdutos.total?.toFixed(2) || '0,00'}</p>
+                </div>
+                <button 
+                  className="modal-close"
+                  onClick={() => setModalProdutosComanda(false)}
+                >
+                  ✕ Fechar
+                </button>
+              </div>
+            </div>
+            <div className="modal-body">
+              <div className="produtos-lista">
+                <h4>Produtos Adicionados ({comandaProdutos.itens?.length || 0})</h4>
+                {comandaProdutos.itens && comandaProdutos.itens.length > 0 ? (
+                  <div className="itens-mesa-lista">
+                    {comandaProdutos.itens.map((item, index) => (
+                       <div key={`${item.produto}-${index}-${item.quantidade}`} className="item-mesa-linha">
+                         <div className="item-nome">{item.nomeProduto}</div>
+                         <div className="item-preco">R$ {item.precoUnitario?.toFixed(2)}</div>
+                         <div className="item-quantidade">Qtd: <strong>{item.quantidade}</strong></div>
+                         <div className="item-subtotal">Subtotal: R$ {item.subtotal?.toFixed(2)}</div>
+                         <div className="item-acoes">
+                           <button 
+                             className="btn-adicionar-item"
+                             onClick={async () => {
+                               try {
+                                 setLoading(true);
+                                 
+                                 const novoItem = {
+                                   produtoId: item.produto,
+                                   quantidade: 1
+                                 };
+                         
+                                 const response = await fetch(`http://localhost:4000/api/sale/${comandaProdutos._id}/item`, {
+                                   method: 'POST',
+                                   headers: {
+                                     'Content-Type': 'application/json'
+                                   },
+                                   body: JSON.stringify(novoItem)
+                                 });
+                         
+                                 if (response.ok) {
+                                     // Atualizar os dados da comanda no modal
+                                     const responseList = await fetch(`http://localhost:4000/api/sale/list`);
+                                     const vendas = await responseList.json();
+                                     const comandaAtualizada = vendas.find(v => v._id === comandaProdutos._id);
+                                     setComandaProdutos(comandaAtualizada);
+                                     // Atualizar vendaAtual se for a comanda selecionada
+                                     if (comandaSelecionada === comandaProdutos._id) {
+                                       setVendaAtual(comandaAtualizada);
+                                     }
+                                     // Atualizar as comandas na tela principal
+                                     carregarComandas();
+                                     setSucesso(`${item.nomeProduto} adicionado à comanda`);
+                                     setTimeout(() => setSucesso(''), 3000);
+                                 } else {
+                                   const errorData = await response.json();
+                                   setErro(errorData.error || 'Erro ao adicionar item');
+                                   setTimeout(() => setErro(''), 3000);
+                                 }
+                               } catch (error) {
+                                 console.error('Erro ao adicionar item:', error);
+                                 setErro('Erro ao adicionar item à comanda');
+                                 setTimeout(() => setErro(''), 3000);
+                               } finally {
+                                 setLoading(false);
+                               }
+                             }}
+                             title="Adicionar mais uma unidade"
+                             disabled={loading}
+                           >
+                             ➕
+                           </button>
+                           <button 
+                             className="btn-remover-item"
+                             onClick={async () => {
+                               try {
+                                 setLoading(true);
+                                 
+                                 const response = await fetch(`http://localhost:4000/api/sale/${comandaProdutos._id}/item/${item.produto}`, {
+                                   method: 'DELETE'
+                                 });
+                         
+                                 if (response.ok) {
+                                     // Atualizar os dados da comanda no modal
+                                     const responseList = await fetch(`http://localhost:4000/api/sale/list`);
+                                     const vendas = await responseList.json();
+                                     const comandaAtualizada = vendas.find(v => v._id === comandaProdutos._id);
+                                     setComandaProdutos(comandaAtualizada);
+                                     // Atualizar vendaAtual se for a comanda selecionada
+                                     if (comandaSelecionada === comandaProdutos._id) {
+                                       setVendaAtual(comandaAtualizada);
+                                     }
+                                     // Atualizar as comandas na tela principal
+                                     carregarComandas();
+                                     setSucesso(`${item.nomeProduto} removido da comanda`);
+                                     setTimeout(() => setSucesso(''), 3000);
+                                 } else {
+                                   const errorData = await response.json();
+                                   setErro(errorData.error || 'Erro ao remover item');
+                                   setTimeout(() => setErro(''), 3000);
+                                 }
+                               } catch (error) {
+                                 console.error('Erro ao remover item:', error);
+                                 setErro('Erro ao remover item da comanda');
+                                 setTimeout(() => setErro(''), 3000);
+                               } finally {
+                                 setLoading(false);
+                               }
+                             }}
+                             title="Remover uma unidade"
+                             disabled={loading}
+                           >
+                             ➖
+                           </button>
+                         </div>
+                       </div>
+                     ))}
+                  </div>
+                ) : (
+                  <p>Nenhum produto adicionado ainda.</p>
+                )}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn-cancelar"
+                onClick={() => setModalProdutosComanda(false)}
+              >
+                Fechar
               </button>
             </div>
           </div>

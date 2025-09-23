@@ -233,6 +233,31 @@
   display: none;
 }
 
+.comanda-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.btn-abrir-modal {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.btn-abrir-modal:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
 .btn-fechar-comanda {
   background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
   color: white;
@@ -243,7 +268,6 @@
   cursor: pointer;
   transition: all 0.3s ease;
   flex-shrink: 0;
-  margin-left: 8px;
 }
 
 .btn-fechar-comanda:hover {
@@ -424,78 +448,115 @@
   border-color: #3498db;
 }
 
-/* Grid de Produtos */
+/* Grid de Produtos - Layout Horizontal como na tela de mesas */
 .produtos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 6px;
+  display: block !important;
+  width: 100% !important;
+  padding: 5px 10px 10px 10px !important;
   flex: 1;
   overflow-y: auto;
 }
 
+/* Produto em linha completa - Layout Horizontal */
 .produto-card {
-  border: 1px solid #ecf0f1;
-  border-radius: 6px;
-  padding: 6px;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 2px 0 !important;
+  margin: 1px 0 !important;
+  cursor: pointer !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
   transition: all 0.3s ease;
-  background: white;
-  display: flex;
-  flex-direction: column;
-  height: fit-content;
 }
 
 .produto-card:hover {
-  border-color: #3498db;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
+  background: #f8f9fa !important;
+  border-radius: 4px !important;
 }
 
-.produto-info h4 {
-  margin: 0 0 3px 0;
-  color: #2c3e50;
-  font-size: 0.85rem;
-  line-height: 1.2;
+.produto-nome {
+  flex: 1 !important;
+  font-weight: 500 !important;
+  color: #2c3e50 !important;
+  font-size: 1rem !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+  margin-right: 15px !important;
 }
 
 .produto-preco {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: #27ae60;
-  margin: 0 0 3px 0;
+  font-weight: 600 !important;
+  color: #27ae60 !important;
+  font-size: 1rem !important;
+  white-space: nowrap !important;
+  margin-right: 15px !important;
+  min-width: 80px !important;
+  text-align: center !important;
 }
 
 .produto-descricao {
-  font-size: 0.75rem;
-  color: #7f8c8d;
-  margin: 0 0 4px 0;
-  line-height: 1.2;
-  flex: 1;
   display: none;
 }
 
-.btn-adicionar {
-  width: 100%;
-  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-  color: white;
-  border: none;
-  padding: 4px 6px;
-  border-radius: 4px;
-  font-weight: 600;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.produto-botoes {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
 }
 
-.btn-adicionar:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+.btn-adicionar-produto {
+  background: #27ae60 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 1px 4px !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 25px !important;
 }
 
-.btn-adicionar:disabled {
-  background: #bdc3c7;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+.btn-remover-produto {
+  background: #e74c3c !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 1px 4px !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 25px !important;
+}
+
+.btn-adicionar-produto:hover {
+  background: #219a52 !important;
+  transform: scale(1.05) !important;
+}
+
+.btn-remover-produto:hover {
+  background: #c0392b !important;
+  transform: scale(1.05) !important;
+}
+
+.btn-adicionar-produto:disabled,
+.btn-remover-produto:disabled {
+  background: #bdc3c7 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.btn-adicionar-produto:disabled:hover,
+.btn-remover-produto:disabled:hover {
+  background: #bdc3c7 !important;
+  transform: none !important;
 }
 
 .sem-produtos {
@@ -504,6 +565,104 @@
   color: #7f8c8d;
   padding: 40px;
   font-style: italic;
+}
+
+/* Estilos para itens da mesa na modal */
+.item-mesa-linha {
+  display: flex !important;
+  align-items: center !important;
+  background: white !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+  gap: 12px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+}
+
+.item-mesa-linha:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.item-nome {
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  font-size: 14px !important;
+  flex: 2 !important;
+  min-width: 120px !important;
+}
+
+.item-quantidade {
+  font-weight: 500 !important;
+  color: #7f8c8d !important;
+  font-size: 14px !important;
+  min-width: 60px !important;
+  text-align: center !important;
+}
+
+.item-preco {
+  font-weight: 600 !important;
+  color: #27ae60 !important;
+  font-size: 14px !important;
+  min-width: 80px !important;
+  text-align: right !important;
+}
+
+/* Botões de ação nos itens da modal - sobrescrever estilos do Mesas.css */
+.btn-adicionar-item {
+  padding: 2px 4px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  width: 25px !important;
+  height: 28px !important;
+  min-width: 25px !important;
+  background-color: #27ae60 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.btn-adicionar-item:hover:not(:disabled) {
+  background-color: #219a52 !important;
+  transform: scale(1.05) !important;
+}
+
+.btn-remover-item {
+  padding: 2px 4px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  width: 25px !important;
+  height: 28px !important;
+  min-width: 25px !important;
+  background-color: #e74c3c !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.btn-remover-item:hover:not(:disabled) {
+  background-color: #c0392b !important;
+  transform: scale(1.05) !important;
+}
+
+.btn-adicionar-item:disabled,
+.btn-remover-item:disabled {
+  background: #bdc3c7 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
 }
 
 /* Modal */

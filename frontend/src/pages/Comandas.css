@@ -111,6 +111,34 @@
   flex-direction: column;
 }
 
+/* Campo de busca de comandas */
+.buscar-comanda-container {
+  margin-bottom: 15px;
+}
+
+.buscar-comanda-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.buscar-comanda-input:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.buscar-comanda-input::placeholder {
+  color: #6c757d;
+  font-style: italic;
+}
+
 .comandas-lista h3 {
   margin: 0 0 10px 0;
   color: #2c3e50;

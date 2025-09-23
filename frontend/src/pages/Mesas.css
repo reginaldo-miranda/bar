@@ -141,6 +141,33 @@
   font-weight: 700;
 }
 
+.buscar-mesa-container {
+  margin-bottom: 15px;
+}
+
+.buscar-mesa-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.buscar-mesa-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  background-color: white;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+.buscar-mesa-input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
 .mesas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));

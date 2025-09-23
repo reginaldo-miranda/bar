@@ -9,6 +9,7 @@ const Mesas = () => {
   const [categorias, setCategorias] = useState([]);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('todas');
   const [buscarProduto, setBuscarProduto] = useState('');
+  const [buscarMesa, setBuscarMesa] = useState('');
   const [mesaSelecionada, setMesaSelecionada] = useState(null);
   const [vendaAtual, setVendaAtual] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -398,8 +399,34 @@ const Mesas = () => {
         <div className="mesas-lista">
           <div className="mesas-section">
             <h3>Todas as Mesas ({mesas.length})</h3>
+            <div className="buscar-mesa-container">
+              <input
+                type="text"
+                className="buscar-mesa-input"
+                placeholder="🔍 Buscar mesa por número ou responsável..."
+                value={buscarMesa}
+                onChange={(e) => setBuscarMesa(e.target.value)}
+              />
+            </div>
             <div className="mesas-grid">
               {mesas
+                .filter(mesa => {
+                  if (!buscarMesa) return true;
+                  const termoBusca = buscarMesa.toLowerCase();
+                  
+                  // Buscar por número da mesa
+                  if (mesa.numero.toString().includes(termoBusca)) return true;
+                  
+                  // Buscar por responsável (se a mesa estiver ocupada)
+                  if (mesa.vendaAtual && mesa.vendaAtual.observacoes && mesa.vendaAtual.observacoes.includes('Responsavel:')) {
+                    const responsavel = mesa.vendaAtual.observacoes.includes(' - ') 
+                      ? mesa.vendaAtual.observacoes.split('Responsavel:')[1].split(' - ')[0].trim().toLowerCase()
+                      : mesa.vendaAtual.observacoes.split('Responsavel:')[1].trim().toLowerCase();
+                    if (responsavel && responsavel.includes(termoBusca)) return true;
+                  }
+                  
+                  return false;
+                })
                 .sort((a, b) => parseInt(a.numero) - parseInt(b.numero))
                 .map(mesa => {
                   const mesaSelecionadaAtual = mesaSelecionada === mesa._id;
@@ -775,7 +802,7 @@ const Mesas = () => {
                   {mesaProdutos.vendaAtual?.observacoes && mesaProdutos.vendaAtual.observacoes.includes(' - ') && (
                     <p style={{color: 'white', margin: '0 0 5px 0', fontSize: '14px'}}>👤 Responsável: {mesaProdutos.vendaAtual.observacoes.split(' - ')[1]?.trim().toUpperCase() || ''}</p>
                   )}
-                  <p style={{color: 'white', margin: '0'}}>Total: R$ {mesaProdutos.vendaAtual?.total?.toFixed(2) || '0,00'}</p>
+                  <p style={{color: 'white', margin: '0', fontSize: '18px', fontWeight: 'bold'}}>Total: R$ {mesaProdutos.vendaAtual?.total?.toFixed(2) || '0,00'}</p>
                 </div>
                 <button 
                   className="modal-close"
@@ -904,10 +931,6 @@ const Mesas = () => {
                     <p>Adicione produtos para começar a venda</p>
                   </div>
                 )}
-              </div>
-              
-              <div className="total-mesa">
-                <h4>Total: R$ {mesaProdutos.vendaAtual?.total?.toFixed(2) || '0.00'}</h4>
               </div>
             </div>
             <div className="modal-footer">

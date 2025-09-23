@@ -457,6 +457,12 @@ const PDV = () => {
         >
           📋 Comanda
         </button>
+        <button 
+          className="nav-btn"
+          onClick={() => window.location.href = '/caixa-resumo'}
+        >
+          💰 Caixa
+        </button>
       </div>
 
       <div className="pdv-layout">

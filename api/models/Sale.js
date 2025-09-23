@@ -76,6 +76,11 @@ const saleSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  formaPagamento: {
+    type: String,
+    enum: ['dinheiro', 'cartao', 'pix'],
+    default: 'dinheiro'
+  },
   status: {
     type: String,
     enum: ['aberta', 'finalizada', 'cancelada'],

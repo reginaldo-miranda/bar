@@ -142,6 +142,38 @@ router.get('/list', async (req, res) => {
   }
 });
 
+// Buscar vendas finalizadas por período (para resumo do caixa)
+router.get('/finalizadas', async (req, res) => {
+  try {
+    const { dataInicio, dataFim } = req.query;
+    const filtros = { status: 'finalizada' };
+    
+    if (dataInicio || dataFim) {
+      filtros.dataVenda = {};
+      if (dataInicio) {
+        // Converter para data local e depois para UTC considerando fuso horário brasileiro (UTC-3)
+        const inicio = new Date(dataInicio + 'T00:00:00-03:00');
+        filtros.dataVenda.$gte = inicio;
+      }
+      if (dataFim) {
+        // Converter para data local e depois para UTC considerando fuso horário brasileiro (UTC-3)
+        const fim = new Date(dataFim + 'T23:59:59-03:00');
+        filtros.dataVenda.$lte = fim;
+      }
+    }
+
+    const vendas = await Sale.find(filtros)
+      .populate('funcionario', 'nome')
+      .populate('cliente', 'nome')
+      .sort({ dataVenda: -1 });
+
+    res.json(vendas);
+  } catch (error) {
+    console.error('Erro ao buscar vendas finalizadas:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
 // Buscar venda por ID
 router.get('/:id', async (req, res) => {
   try {
@@ -317,6 +349,8 @@ router.put('/:id/discount', async (req, res) => {
 // Finalizar venda
 router.put('/:id/finalize', async (req, res) => {
   try {
+    const { formaPagamento } = req.body;
+    
     const venda = await Sale.findById(req.params.id);
     if (!venda) {
       return res.status(404).json({ error: 'Venda não encontrada' });
@@ -328,6 +362,11 @@ router.put('/:id/finalize', async (req, res) => {
 
     if (venda.itens.length === 0) {
       return res.status(400).json({ error: 'Não é possível finalizar uma venda sem itens' });
+    }
+
+    // Definir forma de pagamento se fornecida
+    if (formaPagamento && ['dinheiro', 'cartao', 'pix'].includes(formaPagamento)) {
+      venda.formaPagamento = formaPagamento;
     }
 
     venda.status = 'finalizada';

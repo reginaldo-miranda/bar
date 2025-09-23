@@ -25,6 +25,7 @@ const Comandas = () => {
   });
   const [quantidade, setQuantidade] = useState(1);
   const [buscarProduto, setBuscarProduto] = useState('');
+  const [buscarComanda, setBuscarComanda] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('todos');
   const [categorias, setCategorias] = useState([
     { id: 'todos', nome: 'Todos', icon: '🍽️' }
@@ -294,8 +295,21 @@ const Comandas = () => {
         {/* Lista de Comandas */}
         <div className="comandas-lista">
           <h3>Comandas Ativas ({comandas.length})</h3>
+          <div className="buscar-comanda-container">
+            <input
+              type="text"
+              className="buscar-comanda-input"
+              placeholder="🔍 Buscar comanda pelo nome..."
+              value={buscarComanda}
+              onChange={(e) => setBuscarComanda(e.target.value)}
+            />
+          </div>
           <div className="comandas-grid">
             {comandas
+              .filter(comanda => {
+                const nomeComanda = comanda.nomeComanda || clientes.find(c => c._id === comanda.cliente)?.nome || 'Sem nome';
+                return nomeComanda.toLowerCase().includes(buscarComanda.toLowerCase());
+              })
               .sort((a, b) => {
                 const nomeA = a.nomeComanda || clientes.find(c => c._id === a.cliente)?.nome || 'Sem nome';
                 const nomeB = b.nomeComanda || clientes.find(c => c._id === b.cliente)?.nome || 'Sem nome';

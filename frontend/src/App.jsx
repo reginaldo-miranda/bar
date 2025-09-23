@@ -95,6 +95,7 @@ import PDV from "./pages/PDV";
 import Comandas from "./pages/Comandas";
 import Mesas from "./pages/Mesas";
 import Caixa from "./pages/Caixa";
+import CaixaResumo from "./pages/CaixaResumo";
 import GroupsUnits from "./pages/GroupsUnits";
 
 function App() {
@@ -117,6 +118,7 @@ function App() {
           <Route path="/comandas" element={<Comandas />} />
           <Route path="/mesas" element={<Mesas />} />
           <Route path="/caixa" element={<Caixa />} />
+          <Route path="/caixa-resumo" element={<CaixaResumo />} />
           <Route path="/product/groups-units" element={<GroupsUnits />} />
         </Routes>
       </div>

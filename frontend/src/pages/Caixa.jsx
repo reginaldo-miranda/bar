@@ -50,7 +50,72 @@ const Caixa = () => {
     setErro('');
     
     try {
-      const response = await fetch(`http://localhost:4000/api/sale/${comanda._id}/finalize`, {
+      let vendaId = comanda._id;
+      
+      // Se for venda de balcão com ID fictício, criar a venda primeiro
+      if (comanda._id.startsWith('venda_balcao_')) {
+        const criarVendaResponse = await fetch('http://localhost:4000/api/sale/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            funcionario: comanda.funcionario._id,
+            tipoVenda: 'balcao',
+            nomeComanda: comanda.nomeComanda || 'Venda Balcão'
+          })
+        });
+        
+        if (!criarVendaResponse.ok) {
+          const errorData = await criarVendaResponse.json();
+          setErro(errorData.error || 'Erro ao criar venda');
+          return;
+        }
+        
+        const novaVenda = await criarVendaResponse.json();
+        vendaId = novaVenda._id;
+        
+        // Buscar todos os produtos para fazer o mapeamento
+        const produtosResponse = await fetch('http://localhost:4000/api/product/list');
+        
+        if (!produtosResponse.ok) {
+          setErro('Erro ao buscar produtos');
+          return;
+        }
+        
+        const todosProdutos = await produtosResponse.json();
+        
+        // Adicionar todos os itens à venda
+        for (const item of comanda.itens) {
+          // Buscar produto pelo nome
+          const produto = todosProdutos.find(p => p.nome === item.nomeProduto);
+          
+          if (!produto) {
+            setErro(`Produto '${item.nomeProduto}' não encontrado`);
+            return;
+          }
+          
+          const adicionarItemResponse = await fetch(`http://localhost:4000/api/sale/${vendaId}/item`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              produtoId: produto._id,
+              quantidade: item.quantidade
+            })
+          });
+          
+          if (!adicionarItemResponse.ok) {
+            const errorData = await adicionarItemResponse.json();
+            setErro(errorData.error || 'Erro ao adicionar item');
+            return;
+          }
+        }
+      }
+      
+      // Finalizar a venda
+      const response = await fetch(`http://localhost:4000/api/sale/${vendaId}/finalize`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

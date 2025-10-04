@@ -70,10 +70,12 @@ const Mesas = () => {
           venda.status === 'aberta' && venda.mesa === mesa._id
         );
         
+        // Usar o status do banco de dados diretamente
+        // O backend é responsável por manter a consistência
         return {
           ...mesa,
-          vendaAtual: vendaAberta || null,
-          status: vendaAberta ? 'ocupada' : 'livre'
+          vendaAtual: vendaAberta || null
+          // status mantém o valor original do banco
         };
       });
       

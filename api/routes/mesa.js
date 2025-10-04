@@ -10,6 +10,7 @@ router.get('/list', async (req, res) => {
     const mesas = await Mesa.find({ ativo: true })
       .populate('vendaAtual')
       .sort({ numero: 1 });
+
     res.json(mesas);
   } catch (error) {
     res.status(500).json({ message: 'Erro ao buscar mesas', error: error.message });

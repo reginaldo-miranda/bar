@@ -118,8 +118,8 @@ const Comandas = () => {
         
         setCategorias(novasCategorias);
       }
-    } catch {
-      console.error('Erro ao carregar produtos');
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error);
     }
   };
 
@@ -385,9 +385,9 @@ const Comandas = () => {
             <>
               <div className="comanda-selecionada">
                 <div className="comanda-info-header">
-                  <div>
+                  <div className="comanda-detalhes-principais">
                     <h3>Comanda: {vendaAtual.nomeComanda || 'Sem nome'}</h3>
-                    <p>Total: R$ {vendaAtual.total?.toFixed(2) || '0,00'}</p>
+                    <p>Total: R$ {vendaAtual.total?.toFixed(2) || '0,00'} | Itens: {vendaAtual.itens?.length || 0}</p>
                   </div>
                   <button
                     className="btn-fechar-comanda-fixo"
@@ -398,6 +398,22 @@ const Comandas = () => {
                     💰 Finalizar
                   </button>
                 </div>
+                
+                {/* Resumo dos itens da comanda */}
+                {vendaAtual.itens && vendaAtual.itens.length > 0 && (
+                  <div className="comanda-itens-resumo">
+                    <h4>Itens na comanda:</h4>
+                    <div className="itens-lista">
+                      {vendaAtual.itens.map((item, index) => (
+                        <div key={index} className="item-resumo">
+                          <span className="item-nome">{item.produto.nome}</span>
+                          <span className="item-quantidade">x{item.quantidade}</span>
+                          <span className="item-preco">R$ {(item.quantidade * item.produto.precoVenda).toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Filtros de Categoria */}
@@ -434,28 +450,44 @@ const Comandas = () => {
 
               {/* Grid de Produtos */}
               <div className="produtos-grid">
-                {produtosFiltrados.map(produto => (
-                  <div key={produto._id} className="produto-card">
-                    <div className="produto-nome">{produto.nome}</div>
-                    <div className="produto-preco">R$ {produto.precoVenda?.toFixed(2)}</div>
-                    <div className="produto-botoes">
-                      <button 
-                        className="btn-remover-produto"
-                        onClick={() => removerItem(produto)}
-                        disabled={!vendaAtual}
-                      >
-                        -
-                      </button>
-                      <button
-                        className="btn-adicionar-produto"
-                        onClick={() => adicionarItem(produto)}
-                        disabled={!vendaAtual}
-                      >
-                        +
-                      </button>
+                {produtosFiltrados.map(produto => {
+                  // Calcular quantidade já adicionada na comanda
+                  const itemNaComanda = vendaAtual?.itens?.find(item => item.produto._id === produto._id);
+                  const quantidadeNaComanda = itemNaComanda ? itemNaComanda.quantidade : 0;
+                  
+                  return (
+                    <div key={produto._id} className={`produto-card ${quantidadeNaComanda > 0 ? 'produto-adicionado' : ''}`}>
+                      <div className="produto-nome">{produto.nome}</div>
+                      <div className="produto-direita">
+                        <div className="produto-preco">R$ {produto.precoVenda?.toFixed(2)}</div>
+                        <div className="produto-botoes">
+                          <button 
+                            className="btn-remover-produto"
+                            onClick={() => removerItem(produto)}
+                            disabled={!vendaAtual || quantidadeNaComanda === 0}
+                            title="Remover 1 unidade"
+                          >
+                            -
+                          </button>
+                          <span className="quantidade-display">{quantidadeNaComanda}</span>
+                          <button
+                            className="btn-adicionar-produto"
+                            onClick={() => adicionarItem(produto)}
+                            disabled={!vendaAtual}
+                            title={`Adicionar ${quantidade} unidade(s)`}
+                          >
+                            +{quantidade > 1 ? quantidade : ''}
+                          </button>
+                        </div>
+                      </div>
+                      {quantidadeNaComanda > 0 && (
+                        <div className="produto-total-item">
+                          Total: R$ {(quantidadeNaComanda * produto.precoVenda).toFixed(2)}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 
                 {produtosFiltrados.length === 0 && (
                   <div className="sem-produtos">

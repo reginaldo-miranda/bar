@@ -331,12 +331,14 @@
 }
 
 .comanda-selecionada {
-  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   color: white;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 10px;
+  padding: 4px !important;
+  border-radius: 4px;
+  margin-bottom: 4px !important;
   flex-shrink: 0;
+  max-height: 80px;
+  overflow: hidden;
 }
 
 .comanda-info-header {
@@ -372,14 +374,89 @@
 }
 
 .comanda-selecionada h3 {
-  margin: 0 0 5px 0;
-  font-size: 1.2rem;
+  margin: 0 0 2px 0 !important;
+  font-size: 1rem !important;
 }
 
 .comanda-selecionada p {
-  margin: 0;
-  font-size: 1.1rem;
+  margin: 0 !important;
+  font-size: 0.9rem !important;
   font-weight: 600;
+}
+
+/* Resumo dos itens da comanda - Otimizado FORÇADO */
+.comanda-itens-resumo {
+  margin-top: 5px !important;
+  padding-top: 5px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.comanda-itens-resumo h4 {
+  margin: 0 0 4px 0 !important;
+  font-size: 0.8rem !important;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.itens-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1px !important;
+  max-height: 40px !important;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.itens-lista::-webkit-scrollbar {
+  width: 4px;
+}
+
+.itens-lista::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.itens-lista::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.item-resumo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px !important;
+  border-radius: 2px;
+  font-size: 0.75rem !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+}
+
+.item-nome {
+  flex: 1;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 8px;
+}
+
+.item-quantidade {
+  margin: 0 6px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+  min-width: 20px;
+  text-align: center;
+}
+
+.item-preco {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.8rem;
+  min-width: 50px;
+  text-align: right;
 }
 
 .selecione-comanda {
@@ -485,21 +562,42 @@
   overflow-y: auto;
 }
 
-/* Produto em linha completa - Layout Horizontal */
+/* Produto em linha completa - Layout Horizontal SIMPLES */
 .produto-card {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
   justify-content: space-between !important;
-  width: 100% !important;
-  background: transparent !important;
-  border: none !important;
-  padding: 2px 0 !important;
-  margin: 1px 0 !important;
-  cursor: pointer !important;
-  min-height: 40px !important;
-  max-height: 40px !important;
+  padding: 8px 12px !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 6px !important;
+  margin-bottom: 4px !important;
+  background: white !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
   transition: all 0.3s ease;
+}
+
+.produto-card.produto-adicionado {
+  border-color: #27ae60 !important;
+  background: #f8fff9 !important;
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.1) !important;
+}
+
+.produto-direita {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+.produto-botoes {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 5px !important;
+  flex-shrink: 0 !important;
 }
 
 .produto-card:hover {
@@ -514,7 +612,8 @@
   font-size: 1rem !important;
   line-height: 1.2 !important;
   text-align: left !important;
-  margin-right: 15px !important;
+  margin: 0 !important;
+  padding-right: 10px !important;
 }
 
 .produto-preco {
@@ -522,20 +621,58 @@
   color: #27ae60 !important;
   font-size: 1rem !important;
   white-space: nowrap !important;
-  margin-right: 15px !important;
+  margin: 0 !important;
+  text-align: right !important;
+  flex-shrink: 0 !important;
   min-width: 80px !important;
-  text-align: center !important;
 }
 
 .produto-descricao {
   display: none;
 }
 
+.produto-quantidade-atual {
+  font-size: 0.75rem !important;
+  color: #27ae60 !important;
+  font-weight: 600 !important;
+  background: rgba(39, 174, 96, 0.1) !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
+  white-space: nowrap !important;
+}
+
+.produto-total-item {
+  font-size: 0.85rem !important;
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  background: #ecf0f1 !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+}
+
 .produto-botoes {
   display: flex !important;
   gap: 8px !important;
   align-items: center !important;
+  justify-content: center !important;
   flex-shrink: 0 !important;
+}
+
+.quantidade-display {
+  background: #3498db !important;
+  color: white !important;
+  padding: 6px 8px !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .btn-adicionar-produto {
@@ -543,25 +680,33 @@
   color: white !important;
   border: none !important;
   border-radius: 4px !important;
-  padding: 1px 4px !important;
-  font-size: 0.7rem !important;
+  padding: 6px 10px !important;
+  font-size: 0.85rem !important;
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
-  min-width: 25px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .btn-remover-produto {
-  background: #e74c3c !important;
+  background: #dc3545 !important;
   color: white !important;
   border: none !important;
   border-radius: 4px !important;
-  padding: 1px 4px !important;
-  font-size: 0.7rem !important;
+  padding: 6px 10px !important;
+  font-size: 0.85rem !important;
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
-  min-width: 25px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .btn-adicionar-produto:hover {
@@ -570,7 +715,7 @@
 }
 
 .btn-remover-produto:hover {
-  background: #c0392b !important;
+  background: #cc0000 !important;
   transform: scale(1.05) !important;
 }
 

@@ -216,7 +216,22 @@ const Mesas = () => {
 
     setLoading(true);
     try {
-      // Criar nova venda
+      // Primeiro, abrir a mesa usando o endpoint da API
+      const abrirMesaResponse = await fetch(`http://localhost:4000/api/mesa/${mesaParaAbrir._id}/abrir`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ numeroClientes: 1 })
+      });
+
+      if (!abrirMesaResponse.ok) {
+        const errorData = await abrirMesaResponse.json();
+        setErro(errorData.message || 'Erro ao abrir mesa');
+        return;
+      }
+
+      // Depois, criar nova venda
       const dadosVenda = {
         mesa: mesaParaAbrir._id,
         funcionario: funcionarioSelecionado,
@@ -252,7 +267,7 @@ const Mesas = () => {
         carregarProdutos();
       } else {
         const errorData = await response.json();
-        setErro(errorData.message || 'Erro ao abrir mesa');
+        setErro(errorData.message || 'Erro ao criar venda');
       }
     } catch {
       setErro('Erro ao conectar com o servidor');
